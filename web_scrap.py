@@ -1,7 +1,9 @@
+import grequests
 from bs4 import BeautifulSoup
 import requests
 
 PAGES = 51
+BATCHES = 10
 
 
 def pages_to_list(no_of_page):
@@ -18,32 +20,46 @@ def pages_to_list(no_of_page):
     return links
 
 
-def get_sub_page(link_page):
+def links_to_soup(urls, batches=BATCHES):
     """
-    This function receives the link of a page and returns a list of all subpages.
-    :param link_page: link
+    transform a list of urls to a list of soup
+    :param urls: list of urls
+    :param batches: size for grequests
+    :return: list of soup
+    """
+    sub_pages = (grequests.get(u) for u in urls)
+    sub_responses = grequests.map(sub_pages, size=batches)
+    soup = []
+    for res in sub_responses:
+        soup.append(BeautifulSoup(res.text, 'html.parser'))
+    return soup
+
+
+def get_sub_page(urls, batches):
+    """
+    This function receives the links of all pages and returns a list of all subpages.
+    :param batches: size for grequests
+    :param urls: list of links
     :return: list with the sub links
     """
-    headers = {'Accept-Language': 'en'}
-    source = requests.get(link_page, headers=headers).text
-    soup = BeautifulSoup(source, 'lxml')
     subpages = []
-    for detail in soup.find_all(class_="detail text-caps underline"):
-        subpages.append(detail['href'])
+    for soup_page in links_to_soup(urls, batches):
+        for detail in soup_page.find_all(class_="detail text-caps underline"):
+            subpages.append(detail['href'])
+
     return subpages
 
 
-def get_data(link_sub_page, list_of_attributes=None):
+def get_data(soup, sub_link, list_of_attributes=None):
     """
     This function get the subpage and return a dictionary with all the all_data for the list of attributes
     :param list_of_attributes: list of attributes needed
-    :param link_sub_page: link
+    :param soup: link converted to soup
+    :param sub_link: link
     :return: dictionary with all all all_data of a sub_page
     """
-    sub_page = requests.get(link_sub_page).text
-    all_data = {'Link': link_sub_page}
-    soup = BeautifulSoup(sub_page, 'lxml')
 
+    all_data = {'Link': sub_link}
     price = soup.find(class_="number")
     all_data['Price'] = price.text.strip()
 
@@ -62,17 +78,21 @@ def get_data(link_sub_page, list_of_attributes=None):
     if list_of_attributes is None:
         return all_data
 
-    data = {'Link': link_sub_page}
+    data = {'Link': sub_link}
     for attribute in list_of_attributes:
-        data[attribute] = all_data[attribute]
+        if attribute in all_data:
+            data[attribute] = all_data[attribute]
+        else:
+            data[attribute] = None
     return data
 
 
 def main():
-    links = pages_to_list(1)
-    sub_links = get_sub_page(links[0])
+    links = pages_to_list(PAGES)
+    sub_links = get_sub_page(links, BATCHES)
     attributes = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms']
-    print(get_data(sub_links[0], attributes))
+    for i, soup in enumerate(links_to_soup(sub_links)):
+        print(get_data(soup, sub_links[i], attributes))
 
 
 if __name__ == '__main__':
