@@ -4,7 +4,7 @@ import requests
 PAGES = 51
 
 
-def pages_to_dict(no_of_page):
+def pages_to_list(no_of_page):
     """
     This function receives the number of pages to scrap and returns a list with the links of the different pages
     :param no_of_page: integer
@@ -33,38 +33,46 @@ def get_sub_page(link_page):
     return subpages
 
 
-def get_data(link_sub_page):
+def get_data(link_sub_page, list_of_attributes=None):
     """
-    This function get the subpage and return a dictionary with all the data
+    This function get the subpage and return a dictionary with all the all_data for the list of attributes
+    :param list_of_attributes: list of attributes needed
     :param link_sub_page: link
-    :return: dictionary with all all data of a sub_page
+    :return: dictionary with all all all_data of a sub_page
     """
     sub_page = requests.get(link_sub_page).text
-    data = dict()
+    all_data = {'Link': link_sub_page}
     soup = BeautifulSoup(sub_page, 'lxml')
 
     price = soup.find(class_="number")
-    data['price'] = price.text.strip()
+    all_data['Price'] = price.text.strip()
 
     features = soup.find('dl')  # find the first dl
 
     for feature in features.find_all('dt'):
-        data[feature.text.strip()] = feature.findNext('dd').text.strip()
+        all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
 
     col = soup.find(class_="col-sm-12")
     for col in col.find_all('section'):
         if col.h2.text == "Here's a brief description":
-            data['description'] = col.p.text
+            all_data['Description'] = col.p.text
         if col.h2.text == "Features":
-            data['features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
+            all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
 
+    if list_of_attributes is None:
+        return all_data
+
+    data = {'Link': link_sub_page}
+    for attribute in list_of_attributes:
+        data[attribute] = all_data[attribute]
     return data
 
 
 def main():
-    links = pages_to_dict(1)
+    links = pages_to_list(1)
     sub_links = get_sub_page(links[0])
-    print(get_data(sub_links[0]))
+    attributes = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms']
+    print(get_data(sub_links[0], attributes))
 
 
 if __name__ == '__main__':
