@@ -1,9 +1,11 @@
 import grequests
 from bs4 import BeautifulSoup
-import requests
 
 PAGES = 51
 BATCHES = 10
+HE_TO_EN = {'פנטהאוז': 'Penthouse', 'בית': 'House', 'דירת גן': 'Garden Apartment', 'דופלקס': 'Duplex',
+            'דו משפחתי': 'Semi-detatched', 'וילה': 'Villa', "קוטג'": 'Cottage', 'מגרש': 'Plot', 'סטודיו': 'Studio',
+            'משרד': 'Office', 'מיני פנטהוז': 'Mini Penthouse', 'דירה': 'Apartment'}
 
 
 def pages_to_list(no_of_page):
@@ -66,7 +68,11 @@ def get_data(soup, sub_link, list_of_attributes=None):
     features = soup.find('dl')  # find the first dl
 
     for feature in features.find_all('dt'):
-        all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
+        # Translating from hebrew to english
+        if feature.text.strip() == 'Type of property': #TODO: try catch
+            all_data[feature.text.strip()] = HE_TO_EN[feature.findNext('dd').text.strip()]
+        else:
+            all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
 
     col = soup.find(class_="col-sm-12")
     for col in col.find_all('section'):
@@ -91,6 +97,7 @@ def main():
     links = pages_to_list(PAGES)
     sub_links = get_sub_page(links, BATCHES)
     attributes = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms']
+    # in config file
     for i, soup in enumerate(links_to_soup(sub_links)):
         print(get_data(soup, sub_links[i], attributes))
 
