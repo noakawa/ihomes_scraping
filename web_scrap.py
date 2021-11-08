@@ -1,11 +1,6 @@
 import grequests
 from bs4 import BeautifulSoup
-
-PAGES = 51
-BATCHES = 10
-HE_TO_EN = {'פנטהאוז': 'Penthouse', 'בית': 'House', 'דירת גן': 'Garden Apartment', 'דופלקס': 'Duplex',
-            'דו משפחתי': 'Semi-detatched', 'וילה': 'Villa', "קוטג'": 'Cottage', 'מגרש': 'Plot', 'סטודיו': 'Studio',
-            'משרד': 'Office', 'מיני פנטהוז': 'Mini Penthouse', 'דירה': 'Apartment'}
+import config
 
 
 def pages_to_list(no_of_page):
@@ -17,12 +12,12 @@ def pages_to_list(no_of_page):
     links = []
     page = 1
     while page <= no_of_page:
-        links.append(f'https://www.ihomes.co.il/s/tel-aviv-yafo?page={page}')
+        links.append(config.link+page)
         page += 1
     return links
 
 
-def links_to_soup(urls, batches=BATCHES):
+def links_to_soup(urls, batches):
     """
     transform a list of urls to a list of soup
     :param urls: list of urls
@@ -37,7 +32,7 @@ def links_to_soup(urls, batches=BATCHES):
     return soup
 
 
-def get_sub_page(urls, batches):
+def get_sub_page(urls, batches=config.BATCHES):
     """
     This function receives the links of all pages and returns a list of all subpages.
     :param batches: size for grequests
@@ -70,7 +65,7 @@ def get_data(soup, sub_link, list_of_attributes=None):
     for feature in features.find_all('dt'):
         # Translating from hebrew to english
         if feature.text.strip() == 'Type of property': #TODO: try catch
-            all_data[feature.text.strip()] = HE_TO_EN[feature.findNext('dd').text.strip()]
+            all_data[feature.text.strip()] = config.HE_TO_EN[feature.findNext('dd').text.strip()]
         else:
             all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
 
@@ -94,12 +89,10 @@ def get_data(soup, sub_link, list_of_attributes=None):
 
 
 def main():
-    links = pages_to_list(PAGES)
-    sub_links = get_sub_page(links, BATCHES)
-    attributes = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms']
-    # in config file
+    links = pages_to_list(config.PAGES)
+    sub_links = get_sub_page(links)
     for i, soup in enumerate(links_to_soup(sub_links)):
-        print(get_data(soup, sub_links[i], attributes))
+        print(get_data(soup, sub_links[i], config.ATTRIBUTES))
 
 
 if __name__ == '__main__':
