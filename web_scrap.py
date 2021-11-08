@@ -1,6 +1,13 @@
 import grequests
 from bs4 import BeautifulSoup
 import config
+import sys
+import logging
+
+sys.stdout = open('stdout.log', 'w')
+logging.basicConfig(filename='home.log',
+                    format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
+                    level=logging.INFO)
 
 
 def pages_to_list(no_of_page):
@@ -12,12 +19,12 @@ def pages_to_list(no_of_page):
     links = []
     page = 1
     while page <= no_of_page:
-        links.append(config.link+page)
+        links.append(f'{config.URL}{page}')
         page += 1
     return links
 
 
-def links_to_soup(urls, batches):
+def links_to_soup(urls, batches=config.BATCHES):
     """
     transform a list of urls to a list of soup
     :param urls: list of urls
@@ -27,8 +34,13 @@ def links_to_soup(urls, batches):
     sub_pages = (grequests.get(u) for u in urls)
     sub_responses = grequests.map(sub_pages, size=batches)
     soup = []
-    for res in sub_responses:
+    for index, res in enumerate(sub_responses):
         soup.append(BeautifulSoup(res.text, 'html.parser'))
+        if res.status_code == 200:
+            logging.info(f'{urls[index]} successfully accessed')
+        else:
+            logging.error(f'{urls[index]} not successfully accessed')
+
     return soup
 
 
@@ -40,9 +52,12 @@ def get_sub_page(urls, batches=config.BATCHES):
     :return: list with the sub links
     """
     subpages = []
-    for soup_page in links_to_soup(urls, batches):
-        for detail in soup_page.find_all(class_="detail text-caps underline"):
-            subpages.append(detail['href'])
+    for page, soup_page in enumerate(links_to_soup(urls, batches)):
+        for i, detail in enumerate(soup_page.find_all(class_="detail text-caps underline")):
+            try:
+                subpages.append(detail['href'])
+            except AttributeError:
+                logging.error(f'no href in page {page + 1}, listing number {i + 1}')
 
     return subpages
 
@@ -58,41 +73,58 @@ def get_data(soup, sub_link, list_of_attributes=None):
 
     all_data = {'Link': sub_link}
     price = soup.find(class_="number")
-    all_data['Price'] = price.text.strip()
+    try:
+        all_data['Price'] = price.text.strip()
+    except AttributeError:
+        logging.info(f'{sub_link}: no price found')
 
     features = soup.find('dl')  # find the first dl
 
     for feature in features.find_all('dt'):
         # Translating from hebrew to english
-        if feature.text.strip() == 'Type of property': #TODO: try catch
-            all_data[feature.text.strip()] = config.HE_TO_EN[feature.findNext('dd').text.strip()]
+        if feature.text.strip() == 'Type of property':
+            try:
+                all_data[feature.text.strip()] = config.HE_TO_EN[feature.findNext('dd').text.strip()]
+            except KeyError:
+                logging.info(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
+                all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
         else:
             all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
-
-    col = soup.find(class_="col-sm-12")
+            logging.info(f'{sub_link}: {feature.text.strip()} found')
+    try:
+        col = soup.find(class_="col-sm-12")
+    except AttributeError:
+        logging.info(f'{sub_link}: additional features not found')
     for col in col.find_all('section'):
         if col.h2.text == "Here's a brief description":
             all_data['Description'] = col.p.text
         if col.h2.text == "Features":
             all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
 
+    # Replacing empty string by None
+    all_data_n = {k: None if not v else v for k, v in all_data.items()}
     if list_of_attributes is None:
-        return all_data
+        return all_data_n
 
     data = {'Link': sub_link}
     for attribute in list_of_attributes:
-        if attribute in all_data:
-            data[attribute] = all_data[attribute]
+        if attribute in all_data_n:
+            data[attribute] = all_data_n[attribute]
         else:
             data[attribute] = None
+            logging.info(f'{sub_link}: {attribute} not found')
     return data
 
 
 def main():
+    # links = pages_to_list(config.PAGES)
     links = pages_to_list(config.PAGES)
     sub_links = get_sub_page(links)
+    count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
         print(get_data(soup, sub_links[i], config.ATTRIBUTES))
+        count+=1
+    print(count)
 
 
 if __name__ == '__main__':
