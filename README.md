@@ -6,20 +6,10 @@ Gather data from iHomes, Israel's real estates online listing.
 
 This project contains 4 files: config.py, requirements.txt, web_scrap.py and README.md
 
-1. web_scrap.py
-A python code that gather data from the iHomes website url: 
-https://www.ihomes.co.il/s/tel-aviv-yafo?page=XX
-where XX is replaced by the number of pages from 1 to 51.
-
-It collects information about properties in Tel Aviv and return their following features:
-'Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms'
+There are implemented to scrap data from iHomes website
+and gather information about properties in Tel Aviv only 
 
 It is implemented using bs4 and grequests (see ### Prerequisites)
-
-
-
-
-
 
 ### Prerequisites
 
@@ -86,21 +76,47 @@ $pip install html5lib
 ```
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+After installing the required library (explained in ### Prerequisites)
+Downloads the four files and run web_scrap.py.
 
-Say what the step will be
 
+### Implementation
+
+1. confy.py is a configuration file that has five variable:
 ```
-Give the example
+URL = 'https://www.ihomes.co.il/s/tel-aviv-yafo?page='
+```
+the url of iHomes website 
+
+PAGE: the number of web pages from which we'll gather data in this case 51
+'https://www.ihomes.co.il/s/tel-aviv-yafo?page=XX' in the previous url we will replace XX 
+with the page number 1-51
+
+BATCHES : the number of batches used for the grequest
+HE_TO_EN: A dictionary used to translate words from hebrew to english. 
+iHomes is originally an israeli website implemented in hebrew with available english translation, 
+scraping data using grequest and bs4 do not automatically translate the data, 
+therefore we created HE_TO_EN to make the translation
+
+Those variables are called in web_scrap.py and referenced as:
+```
+config.[VARIABLE_NAME]
 ```
 
-And repeat
+2. web_scrap.py contain a python code which calls main() and three other functions
 
-```
-until finished
-```
+pages_to_list(no_of_page) return a list of links of pages in the website depending on the input number 
+in our case number of pages is 51, defined in the config file.
+links_to_soup(urls, batches=config.BATCHES): will create a soup object using for each input urls, using grequest and the input batches number
+get_data(soup, sub_link, list_of_attributes=None): get the subpage urls and return a dictionary with all the data for the list of attributes (defines in config.py)
+If no data are available for a specific attribute the function will describe it as None
 
-End with an example of getting some data out of the system or using it for a little demo
+In addition, the code will create a file home.log with the logging.
+
+
+3. requirement.txt: 
+
+
 
 ## Running the tests
 
@@ -114,45 +130,13 @@ Explain what these tests test and why
 Give an example
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
+Noa Kawa
+Keren Portugais
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
