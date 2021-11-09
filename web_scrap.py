@@ -86,7 +86,7 @@ def get_data(soup, sub_link, list_of_attributes=None):
             try:
                 all_data[feature.text.strip()] = config.HE_TO_EN[feature.findNext('dd').text.strip()]
             except KeyError:
-                logging.info(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
+                logging.error(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
                 all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
         else:
             all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
