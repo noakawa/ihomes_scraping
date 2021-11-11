@@ -21,6 +21,7 @@ def pages_to_list(no_of_page):
     while page <= no_of_page:
         links.append(f'{config.URL}{page}')
         page += 1
+    logging.info(f'{no_of_page} pages link in the list')
     return links
 
 
@@ -56,6 +57,7 @@ def get_sub_page(urls, batches=config.BATCHES):
         for i, detail in enumerate(soup_page.find_all(class_="detail text-caps underline")):
             try:
                 subpages.append(detail['href'])
+                logging.info(f'link subpage number {i + 1} for {page + 1} found')
             except AttributeError:
                 logging.error(f'no href in page {page + 1}, listing number {i + 1}')
 
@@ -75,8 +77,9 @@ def get_data(soup, sub_link, list_of_attributes=None):
     price = soup.find(class_="number")
     try:
         all_data['Price'] = price.text.strip()
+        logging.info(f'{sub_link}: price found')
     except AttributeError:
-        logging.info(f'{sub_link}: no price found')
+        logging.error(f'{sub_link}: no price found')
 
     features = soup.find('dl')  # find the first dl
 
@@ -94,12 +97,18 @@ def get_data(soup, sub_link, list_of_attributes=None):
     try:
         col = soup.find(class_="col-sm-12")
     except AttributeError:
-        logging.info(f'{sub_link}: additional features not found')
+        logging.error(f'{sub_link}: additional features including description not found')
     for col in col.find_all('section'):
         if col.h2.text == "Here's a brief description":
-            all_data['Description'] = col.p.text
+            try:
+                all_data['Description'] = col.p.text
+            except AttributeError:
+                logging.error(f'{sub_link}: description not found')
         if col.h2.text == "Features":
-            all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
+            try:
+                all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
+            except AttributeError:
+                logging.error(f'{sub_link}: additional features not found')
 
     # Replacing empty string by None
     all_data_n = {k: None if not v else v for k, v in all_data.items()}
@@ -112,18 +121,17 @@ def get_data(soup, sub_link, list_of_attributes=None):
             data[attribute] = all_data_n[attribute]
         else:
             data[attribute] = None
-            logging.info(f'{sub_link}: {attribute} not found')
+            logging.info(f'{sub_link}: REQUIRED {attribute} not found')
     return data
 
 
 def main():
-    # links = pages_to_list(config.PAGES)
     links = pages_to_list(config.PAGES)
     sub_links = get_sub_page(links)
     count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
         print(get_data(soup, sub_links[i], config.ATTRIBUTES))
-        count+=1
+        count += 1
     print(count)
 
 
