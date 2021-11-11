@@ -115,25 +115,9 @@ In addition, the code will create a file home.log with the logging.
 
 
 3. requirement.txt: 
+Show installed packages using pip freeze
 
 
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 Noa Kawa
