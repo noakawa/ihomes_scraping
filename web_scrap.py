@@ -74,15 +74,34 @@ def get_data(soup, sub_link, list_of_attributes=None):
     """
 
     all_data = {'Link': sub_link}
+    all_data = get_price(soup, all_data, sub_link)
+    features = soup.find('dl')  # find the first dl
+    all_data = get_features(all_data, features, sub_link)
+    try:
+        col = soup.find(class_="col-sm-12")
+    except AttributeError:
+        logging.error(f'{sub_link}: additional features including description not found')
+    all_data = get_sections(all_data, col, sub_link)
+
+    # Replacing empty string by None
+    all_data_n = {k: None if not v else v for k, v in all_data.items()}
+    if list_of_attributes is None:
+        return all_data_n
+    else:
+        return subset_data(all_data_n, list_of_attributes, sub_link)
+
+
+def get_price(soup, all_data, sub_link):
     price = soup.find(class_="number")
     try:
         all_data['Price'] = price.text.strip()
         logging.info(f'{sub_link}: price found')
     except AttributeError:
         logging.error(f'{sub_link}: no price found')
+    return all_data
 
-    features = soup.find('dl')  # find the first dl
 
+def get_features(all_data, features, sub_link):
     for feature in features.find_all('dt'):
         # Translating from hebrew to english
         if feature.text.strip() == 'Type of property':
@@ -94,10 +113,10 @@ def get_data(soup, sub_link, list_of_attributes=None):
         else:
             all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
             logging.info(f'{sub_link}: {feature.text.strip()} found')
-    try:
-        col = soup.find(class_="col-sm-12")
-    except AttributeError:
-        logging.error(f'{sub_link}: additional features including description not found')
+    return all_data
+
+
+def get_sections(all_data, col, sub_link):
     for col in col.find_all('section'):
         if col.h2.text == "Here's a brief description":
             try:
@@ -109,12 +128,10 @@ def get_data(soup, sub_link, list_of_attributes=None):
                 all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
             except AttributeError:
                 logging.error(f'{sub_link}: additional features not found')
+    return all_data
 
-    # Replacing empty string by None
-    all_data_n = {k: None if not v else v for k, v in all_data.items()}
-    if list_of_attributes is None:
-        return all_data_n
 
+def subset_data(all_data_n, list_of_attributes, sub_link):
     data = {'Link': sub_link}
     for attribute in list_of_attributes:
         if attribute in all_data_n:
