@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import config
 import sys
 import logging
+import requests
 
 sys.stdout = open('stdout.log', 'w')
 logging.basicConfig(filename='home.log',
@@ -10,7 +11,26 @@ logging.basicConfig(filename='home.log',
                     level=logging.INFO)
 
 
-def pages_to_list(no_of_page):
+def url_city():
+    """ This function return the url od the specific city """
+    return f'https://www.ihomes.co.il/s/{config.CITY}'
+
+
+def max_pages():
+    """ This function returns the maximum the number of pages of link """
+    url = url_city()
+    page = requests.get(url)
+    if page.status_code == 200:
+        logging.info(f'{url} successfully accessed')
+    else:
+        logging.error(f'{url} not successfully accessed')
+    soup = BeautifulSoup(page.text, 'html.parser')
+    p = soup.find(class_="page-pagination")
+    pages = p.findAll(class_="page-item")
+    return int(pages[-2].text)
+
+
+def pages_to_list(no_of_page=max_pages()):
     """
     This function receives the number of pages to scrap and returns a list with the links of the different pages
     :param no_of_page: integer
@@ -19,7 +39,7 @@ def pages_to_list(no_of_page):
     links = []
     page = 1
     while page <= no_of_page:
-        links.append(f'{config.URL}{page}')
+        links.append(f'{url_city()}?page={page}')
         page += 1
     logging.info(f'{no_of_page} pages link in the list')
     return links
@@ -92,6 +112,13 @@ def get_data(soup, sub_link, list_of_attributes=None):
 
 
 def get_price(soup, all_data, sub_link):
+    """
+    This function returns the dictionary updated with the price
+    :param soup: link converted to soup
+    :param all_data: previous dictionary
+    :param sub_link: link of the house
+    :return: all_data updated
+    """
     price = soup.find(class_="number")
     try:
         all_data['Price'] = price.text.strip()
@@ -102,6 +129,13 @@ def get_price(soup, all_data, sub_link):
 
 
 def get_features(all_data, features, sub_link):
+    """
+    This function returns the dictionary updated with the features
+    :param all_data: previous dictionary
+    :param features: list of features as html text
+    :param sub_link: link of the house
+    :return: all_data updated
+    """
     for feature in features.find_all('dt'):
         # Translating from hebrew to english
         if feature.text.strip() == 'Type of property':
@@ -117,6 +151,13 @@ def get_features(all_data, features, sub_link):
 
 
 def get_sections(all_data, col, sub_link):
+    """
+    This function returns the dictionary updated with the features in the bottom part of the page
+    :param all_data: previous dictionary
+    :param col: list of features as html text
+    :param sub_link: link of the house
+    :return: all_data updated
+    """
     for col in col.find_all('section'):
         if col.h2.text == "Features":
             try:
@@ -127,6 +168,13 @@ def get_sections(all_data, col, sub_link):
 
 
 def subset_data(all_data_n, list_of_attributes, sub_link):
+    """
+    This function returns a dictionary with the specific data asked
+    :param all_data_n: all the data that was scraped
+    :param list_of_attributes: attributes needed
+    :param sub_link: link of the house
+    :return: Dictionary with new data
+    """
     data = {'Link': sub_link}
     for attribute in list_of_attributes:
         if attribute in all_data_n:
@@ -138,7 +186,7 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
 
 
 def main():
-    links = pages_to_list(config.PAGES)
+    links = pages_to_list()
     sub_links = get_sub_page(links)
     count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
