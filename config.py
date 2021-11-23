@@ -5,3 +5,4 @@ HE_TO_EN = {'פנטהאוז': 'Penthouse', 'בית': 'House', 'דירת גן': '
             'דו משפחתי': 'Semi-detatched', 'וילה': 'Villa', "קוטג'": 'Cottage', 'מגרש': 'Plot', 'סטודיו': 'Studio',
             'משרד': 'Office', 'מיני פנטהוז': 'Mini Penthouse', 'דירה': 'Apartment', 'בנין': 'building'}
 ATTRIBUTES = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms']
+CITY = 'jerusalem'
