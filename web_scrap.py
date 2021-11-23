@@ -118,11 +118,6 @@ def get_features(all_data, features, sub_link):
 
 def get_sections(all_data, col, sub_link):
     for col in col.find_all('section'):
-        if col.h2.text == "Here's a brief description":
-            try:
-                all_data['Description'] = col.p.text
-            except AttributeError:
-                logging.error(f'{sub_link}: description not found')
         if col.h2.text == "Features":
             try:
                 all_data['Features'] = col.find(class_='features-checkboxes columns-3').text.split('\n')[1:-1]
