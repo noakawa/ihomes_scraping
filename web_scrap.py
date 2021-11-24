@@ -228,21 +228,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-# def main():
-#     if len(sys.argv) == NUM_ARGS_HELP and sys.argv[1] == '--help':
-#         print(HELP_STRING)
-#         return
-#     elif len(sys.argv) == NUM_ARGS_NO_ARGS:
-#         print(f'ERROR: No arguments were given.\nFor proper usage:\n{HELP_STRING}', )
-#         return
-#
-#     # if sys.argv[1] == 's':
-#     #     arg1 = 'Sell'
-#     # elif sys.argv[1] == 'r':
-#     #     arg1 = 'Rent'
-#
-#     links = pages_to_list(config.PAGES)
-#     sub_links = get_sub_page(links)
-#     count = 0
-#     for i, soup in enumer
