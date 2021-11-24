@@ -1,4 +1,12 @@
-import grequests
+[14:11, 24/11/2021] Noa Kawa Isr: def main():
+    links = pages_to_list()
+    sub_links = get_sub_page(links)
+    count = 0
+    for i, soup in enumerate(links_to_soup(sub_links)):
+        print(get_data(soup, sub_links[i], '01/10/2021'))
+        count += 1
+    print(count)
+[14:13, 24/11/2021] Noa Kawa Isr: import grequests
 from bs4 import BeautifulSoup
 import config
 import sys
@@ -201,5 +209,33 @@ def main():
     print(count)
 
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     main()
+
+
+
+
+
+def main():
+    if len(sys.argv) == NUM_ARGS_HELP and sys.argv[1] == '--help':
+        print(HELP_STRING)
+        return
+    elif len(sys.argv) == NUM_ARGS_NO_ARGS:
+        print(f'ERROR: No arguments were given.\nFor proper usage:\n{HELP_STRING}', )
+        return
+
+    # if sys.argv[1] == 's':
+    #     arg1 = 'Sell'
+    # elif sys.argv[1] == 'r':
+    #     arg1 = 'Rent'
+
+    links = pages_to_list(config.PAGES)
+    sub_links = get_sub_page(links)
+    count = 0
+    for i, soup in enumerate(links_to_soup(sub_links)):
+        data = get_data(soup, sub_links[i], config.ATTRIBUTES)
+        if data['Sale or Rent ?'] == arg1 and data['Type of property'] == sys.argv[2] and data['Rooms'] == sys.argv[3]:
+            print(data)
+        count += 1
+    print(count)
+    
