@@ -141,39 +141,14 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
             logging.info(f'{sub_link}: REQUIRED {attribute} not found')
     return data
 
-
-HELP_STRING = """
-arg1: [s - Sell, r - Rent]
-arg2: [a - Apartment, h - House, v - Villa, g - Garden Apartment, o - Office]
-arg3: Number of rooms
-"""
-NUM_ARGS_NO_ARGS = 1
-NUM_ARGS_HELP = 2
-
-
 def main():
-    if len(sys.argv) == NUM_ARGS_HELP and sys.argv[1] == '--help':
-        print(HELP_STRING)
-        return
-    elif len(sys.argv) == NUM_ARGS_NO_ARGS:
-        print(f'ERROR: No arguments were given.\nFor proper usage:\n{HELP_STRING}', )
-        return
-
-    # if sys.argv[1] == 's':
-    #     arg1 = 'Sell'
-    # elif sys.argv[1] == 'r':
-    #     arg1 = 'Rent'
-
-    links = pages_to_list(config.PAGES)
+    links = pages_to_list()
     sub_links = get_sub_page(links)
     count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
-        data = get_data(soup, sub_links[i], config.ATTRIBUTES)
-        if data['Sale or Rent ?'] == arg1 and data['Type of property'] == sys.argv[2] and data['Rooms'] == sys.argv[3]:
-            print(data)
+        print(get_data(soup, sub_links[i], '01/10/2021'))
         count += 1
     print(count)
-
 
 if __name__ == '__main__':
     main()
