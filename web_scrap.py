@@ -1,12 +1,12 @@
 import grequests
 from bs4 import BeautifulSoup
 import config
-import sys
 import logging
 import requests
 from datetime import datetime
 import re
 from currency_converter import CurrencyConverter
+import argparse
 
 logging.basicConfig(filename='home.log',
                     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
@@ -18,9 +18,13 @@ def url_city(city):
     return f'https://www.ihomes.co.il/s/{city}'
 
 
-def max_pages():
-    """ This function returns the maximum number of pages of link """
-    url = url_city()
+def max_pages(city):
+    """
+    This function returns the maximum number of pages of link
+    :param city: city to scrap
+    :return: integer maximum of pages
+    """
+    url = url_city(city)
     page = requests.get(url)
     if page.status_code == 200:
         logging.info(f'{url} successfully accessed')
@@ -32,7 +36,7 @@ def max_pages():
     return int(pages[-2].text)
 
 
-def pages_to_list(city, no_of_page=max_pages()):
+def pages_to_list(city, no_of_page):
     """
     This function receives the number of pages to scrap and returns a list with the links of the different pages
     :param city: city to scrap
@@ -87,9 +91,12 @@ def get_sub_page(urls, batches=config.BATCHES):
     return subpages
 
 
-def get_data(soup, sub_link, min_date, list_of_attributes=None):
+def get_data(soup, sub_link, max_price=None, min_date=None, list_of_attributes=None, sell=True, rent=True):
     """
     This function get the subpage and return a dictionary with all the all_data for the list of attributes
+    :param max_price: maximum price to list
+    :param rent: Show only the ones to rent
+    :param sell: Show only the ones to sale
     :param list_of_attributes: list of attributes needed
     :param soup: link converted to soup
     :param sub_link: link
@@ -101,9 +108,14 @@ def get_data(soup, sub_link, min_date, list_of_attributes=None):
     try:
         features = soup.find('dl')  # find the first dl
         all_data = get_features(all_data, features, sub_link)
-        if all_data['First listed'] < datetime.strptime(min_date, "%d/%m/%Y"):
+        if min_date is not None and all_data['First listed'] < datetime.strptime(min_date, "%d/%m/%Y"):
+            return
+        if (all_data['Sale or Rent ?'] == 'Sell' and sell is False) or \
+                (all_data['Sale or Rent ?'] == 'Rent' and rent is False):
             return
         all_data = get_price(soup, all_data, sub_link)
+        if max_price is not None and all_data['Price'] > max_price:
+            return
         col = soup.find(class_="col-sm-12")
         all_data = get_sections(all_data, col, sub_link)
     except AttributeError:
@@ -207,24 +219,53 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
     return data
 
 
+def valid_date(s):
+    try:
+        return datetime.strptime(s, "%Y-%m-%d")
+    except ValueError:
+        msg = "not a valid date: {0!r}".format(s)
+        raise argparse.ArgumentTypeError(msg)
+
+
 def main():
-    if len(sys.argv) == config.NUM_ARGS_HELP and sys.argv[1] == '--help':
-        print(config.HELP_STRING)
-        return
-    elif len(sys.argv) == config.NUM_ARGS_NO_ARGS:
-        print(f'ERROR: No arguments were given.\nFor proper usage:\n{config.HELP_STRING}', )
-        return
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--sale_or_rent', help=f"choose from ({','.join(config.OPTIONS)})",
+                        choices=config.OPTIONS, default=True)
+    parser.add_argument('-p', '--max_price', type=float, help='maximum price for each house', default=True)
+    parser.add_argument('-d', '--min_date', help='minimum date it was listed - format DD/MM/YYYY',
+                        type=valid_date, default=True)
+    parser.add_argument('-c', '--cities', help=f"choose from the keys : {config.CITIES}", choices=config.CITIES.keys(),
+                        default=True)
+    args = parser.parse_args()
+    s = args.sale_or_rent
+    price = args.max_price
+    date = args.min_date
+    city = args.cities
+
+    if s and price and date and city:
+        links = pages_to_list(config.CITY, max_pages(config.CITY))
+        sub_links = get_sub_page(links)
+        for i, soup in enumerate(links_to_soup(sub_links)):
+            print(get_data(soup, sub_links[i], list_of_attributes=config.ATTRIBUTES))
 
     else:
-        links = pages_to_list(sys.argv[4])
+        links = pages_to_list(config.CITIES[city], max_pages(config.CITIES[city]))
         sub_links = get_sub_page(links)
-        count = 0
-        for i, soup in enumerate(links_to_soup(sub_links)):
-            print(get_data(soup, sub_links[i], sys.argv[3]))
-            count += 1
-        print(count)
+    print(s)
+
+    #     for i, soup in enumerate(links_to_soup(sub_links)):
+    #         data = get_data(soup, sub_links[i], config.ATTRIBUTES)
+    #         if data['S']
+    #         sell = True
+    #         rent = True
+    #         if sys.argv[1] == 'Sell':
+    #             rent = False
+    #         if sys.argv[1] == 'Rent':
+    #             sell = False
+    #         print(get_data(soup, sub_links[i], sys.argv[2], sys.argv[3], sell=sell, rent=rent))
+    #         count += 1
+    #     print(count)
 
 
 if __name__ == '__main__':
     main()
-
