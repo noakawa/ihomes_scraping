@@ -5,6 +5,8 @@ import sys
 import logging
 import requests
 from datetime import datetime
+import re
+from currency_converter import CurrencyConverter
 
 logging.basicConfig(filename='home.log',
                     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
@@ -115,6 +117,20 @@ def get_data(soup, sub_link, min_date, list_of_attributes=None):
         return subset_data(all_data_n, list_of_attributes, sub_link)
 
 
+def price_shekels(price):
+    """
+    This function returns the price in shekels if it is not
+    :param price: price
+    :return: price in shekels
+    """
+    num = int(''.join(re.findall('[0-9]+', price)))
+    c = CurrencyConverter()
+    if price[0] == '$':
+        return int(c.convert(num, 'USD', 'ILS'))
+    else:
+        return int(num)
+
+
 def get_price(soup, all_data, sub_link):
     """
     This function returns the dictionary updated with the price
@@ -125,7 +141,7 @@ def get_price(soup, all_data, sub_link):
     """
     price = soup.find(class_="number")
     try:
-        all_data['Price'] = price.text.strip()
+        all_data['Price'] = price_shekels(price.text.strip())
         logging.info(f'{sub_link}: price found')
     except AttributeError:
         logging.error(f'{sub_link}: no price found')
@@ -192,7 +208,6 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
 
 
 def main():
-    print(len(sys.argv))
     if len(sys.argv) == config.NUM_ARGS_HELP and sys.argv[1] == '--help':
         print(config.HELP_STRING)
         return
@@ -212,6 +227,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 # def main():
 #     if len(sys.argv) == NUM_ARGS_HELP and sys.argv[1] == '--help':
