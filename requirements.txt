@@ -1,6 +1,7 @@
 beautifulsoup4==4.10.0
 certifi==2021.10.8
 charset-normalizer==2.0.7
+CurrencyConverter==0.16.5
 gevent==21.8.0
 greenlet==1.1.2
 grequests==0.6.0
