@@ -5,6 +5,8 @@ import sys
 import logging
 import requests
 from datetime import datetime
+import re
+from currency_converter import CurrencyConverter
 
 sys.stdout = open('stdout.log', 'w')
 logging.basicConfig(filename='home.log',
@@ -115,6 +117,20 @@ def get_data(soup, sub_link, min_date, list_of_attributes=None):
         return subset_data(all_data_n, list_of_attributes, sub_link)
 
 
+def price_shekels(price):
+    """
+    This function returns the price in shekels if it is not
+    :param price: price
+    :return: price in shekels
+    """
+    num = int(''.join(re.findall('[0-9]+', price)))
+    c = CurrencyConverter()
+    if price[0] == '$':
+        return int(c.convert(num, 'USD', 'ILS'))
+    else:
+        return int(num)
+
+
 def get_price(soup, all_data, sub_link):
     """
     This function returns the dictionary updated with the price
@@ -125,7 +141,7 @@ def get_price(soup, all_data, sub_link):
     """
     price = soup.find(class_="number")
     try:
-        all_data['Price'] = price.text.strip()
+        all_data['Price'] = price_shekels(price.text.strip())
         logging.info(f'{sub_link}: price found')
     except AttributeError:
         logging.error(f'{sub_link}: no price found')
@@ -192,13 +208,16 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
 
 
 def main():
-    links = pages_to_list()
+    links = pages_to_list(3)
     sub_links = get_sub_page(links)
     count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
         print(get_data(soup, sub_links[i], '01/10/2021'))
         count += 1
     print(count)
+    # page = requests.get('https://www.ihomes.co.il/p/MzA1Nw')
+    # soup = BeautifulSoup(page.text, 'html.parser')
+    # print(get_data(soup, 'https://www.ihomes.co.il/p/MzA1Nw', '01/10/2000'))
 
 
 if __name__ == '__main__':
