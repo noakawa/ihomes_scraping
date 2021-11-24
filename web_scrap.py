@@ -4,6 +4,7 @@ import config
 import sys
 import logging
 import requests
+from datetime import datetime
 
 sys.stdout = open('stdout.log', 'w')
 logging.basicConfig(filename='home.log',
@@ -84,24 +85,27 @@ def get_sub_page(urls, batches=config.BATCHES):
     return subpages
 
 
-def get_data(soup, sub_link, list_of_attributes=None):
+def get_data(soup, sub_link, min_date, list_of_attributes=None):
     """
     This function get the subpage and return a dictionary with all the all_data for the list of attributes
     :param list_of_attributes: list of attributes needed
     :param soup: link converted to soup
     :param sub_link: link
+    :param min_date: minimum date when listed
     :return: dictionary with all all all_data of a sub_page
     """
 
     all_data = {'Link': sub_link}
-    all_data = get_price(soup, all_data, sub_link)
-    features = soup.find('dl')  # find the first dl
-    all_data = get_features(all_data, features, sub_link)
     try:
+        features = soup.find('dl')  # find the first dl
+        all_data = get_features(all_data, features, sub_link)
+        if all_data['First listed'] < datetime.strptime(min_date, "%d/%m/%Y"):
+            return
+        all_data = get_price(soup, all_data, sub_link)
         col = soup.find(class_="col-sm-12")
+        all_data = get_sections(all_data, col, sub_link)
     except AttributeError:
         logging.error(f'{sub_link}: additional features including description not found')
-    all_data = get_sections(all_data, col, sub_link)
 
     # Replacing empty string by None
     all_data_n = {k: None if not v else v for k, v in all_data.items()}
@@ -144,6 +148,8 @@ def get_features(all_data, features, sub_link):
             except KeyError:
                 logging.error(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
                 all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
+        elif feature.text.strip() == 'First listed':
+            all_data['First listed'] = datetime.strptime(feature.findNext('dd').text.strip(), "%d/%m/%Y")
         else:
             all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
             logging.info(f'{sub_link}: {feature.text.strip()} found')
@@ -190,7 +196,7 @@ def main():
     sub_links = get_sub_page(links)
     count = 0
     for i, soup in enumerate(links_to_soup(sub_links)):
-        print(get_data(soup, sub_links[i], config.ATTRIBUTES))
+        print(get_data(soup, sub_links[i], '01/10/2021'))
         count += 1
     print(count)
 
