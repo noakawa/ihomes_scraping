@@ -8,19 +8,18 @@ from datetime import datetime
 import re
 from currency_converter import CurrencyConverter
 
-sys.stdout = open('stdout.log', 'w')
 logging.basicConfig(filename='home.log',
                     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
                     level=logging.INFO)
 
 
-def url_city():
+def url_city(city):
     """ This function return the url od the specific city """
-    return f'https://www.ihomes.co.il/s/{config.CITY}'
+    return f'https://www.ihomes.co.il/s/{city}'
 
 
 def max_pages():
-    """ This function returns the maximum the number of pages of link """
+    """ This function returns the maximum number of pages of link """
     url = url_city()
     page = requests.get(url)
     if page.status_code == 200:
@@ -33,16 +32,17 @@ def max_pages():
     return int(pages[-2].text)
 
 
-def pages_to_list(no_of_page=max_pages()):
+def pages_to_list(city, no_of_page=max_pages()):
     """
     This function receives the number of pages to scrap and returns a list with the links of the different pages
+    :param city: city to scrap
     :param no_of_page: integer
     :return: list with the links
     """
     links = []
     page = 1
     while page <= no_of_page:
-        links.append(f'{url_city()}?page={page}')
+        links.append(f'{url_city(city)}?page={page}')
         page += 1
     logging.info(f'{no_of_page} pages link in the list')
     return links
@@ -208,16 +208,21 @@ def subset_data(all_data_n, list_of_attributes, sub_link):
 
 
 def main():
-    links = pages_to_list(3)
-    sub_links = get_sub_page(links)
-    count = 0
-    for i, soup in enumerate(links_to_soup(sub_links)):
-        print(get_data(soup, sub_links[i], '01/10/2021'))
-        count += 1
-    print(count)
-    # page = requests.get('https://www.ihomes.co.il/p/MzA1Nw')
-    # soup = BeautifulSoup(page.text, 'html.parser')
-    # print(get_data(soup, 'https://www.ihomes.co.il/p/MzA1Nw', '01/10/2000'))
+    if len(sys.argv) == config.NUM_ARGS_HELP and sys.argv[1] == '--help':
+        print(config.HELP_STRING)
+        return
+    elif len(sys.argv) == config.NUM_ARGS_NO_ARGS:
+        print(f'ERROR: No arguments were given.\nFor proper usage:\n{config.HELP_STRING}', )
+        return
+
+    else:
+        links = pages_to_list(sys.argv[4])
+        sub_links = get_sub_page(links)
+        count = 0
+        for i, soup in enumerate(links_to_soup(sub_links)):
+            print(get_data(soup, sub_links[i], sys.argv[3]))
+            count += 1
+        print(count)
 
 
 if __name__ == '__main__':
@@ -239,9 +244,4 @@ if __name__ == '__main__':
 #     links = pages_to_list(config.PAGES)
 #     sub_links = get_sub_page(links)
 #     count = 0
-#     for i, soup in enumerate(links_to_soup(sub_links)):
-#         data = get_data(soup, sub_links[i], config.ATTRIBUTES)
-#         if data['Sale or Rent ?'] == arg1 and data['Type of property'] == sys.argv[2] and data['Rooms'] == sys.argv[3]:
-#             print(data)
-#         count += 1
-#     print(count)
+#     for i, soup in enumer
