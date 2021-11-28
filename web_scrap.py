@@ -141,6 +141,7 @@ def valid_date(s):
 
 def print_output(s, p, d, city):
     city_to_slinks = dict()
+    values = []
     if not city:
         for c in config.CITIES.values():
             links = out_of_scrap.pages_to_list(c, out_of_scrap.max_pages(c))
@@ -151,8 +152,11 @@ def print_output(s, p, d, city):
 
     for city in city_to_slinks:
         for i, soup in enumerate(out_of_scrap.links_to_soup(city_to_slinks[city])):
-            print(get_data(city, soup, city_to_slinks[city][i],
-                           sell_or_rent=s, max_price=p, min_date=d))
+            value = get_data(city, soup, city_to_slinks[city][i],
+                             sell_or_rent=s, max_price=p, min_date=d)
+            # print(value)
+            values.append(value)
+    return values
 
 
 def main():
@@ -170,7 +174,7 @@ def main():
     date = args.min_date
     city = args.cities
 
-    print_output(s, price, date, city)
+    return print_output(s, price, date, city)
 
 
 if __name__ == '__main__':
