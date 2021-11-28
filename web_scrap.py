@@ -14,12 +14,11 @@ logging.basicConfig(filename='home.log',
 def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date=False):
     """
     This function get the subpage and return a dictionary with all the all_data for the list of attributes
-    :param sell_or_rent: False if we take sell and rent, value otherwise
     :param city: city of the data
-    :param max_price: maximum price to list
-    :param list_of_attributes: list of attributes needed
     :param soup: link converted to soup
     :param sub_link: link
+    :param sell_or_rent: False if we take sell and rent, value otherwise
+    :param max_price: maximum price to list
     :param min_date: minimum date when listed
     :return: dictionary with all all all_data of a sub_page
     """
@@ -111,6 +110,7 @@ def get_features(all_data, features, sub_link):
 def subset_data(all_data_n, list_of_attributes, sub_link, city):
     """
     This function returns a dictionary with the specific data asked
+    :param city: city to scrap
     :param all_data_n: all the data that was scraped
     :param list_of_attributes: attributes needed
     :param sub_link: link of the house
@@ -127,6 +127,7 @@ def subset_data(all_data_n, list_of_attributes, sub_link, city):
 
 
 def valid_date(s):
+    """ This function raise an error if the format of the input date is not correct """
     try:
         return datetime.strptime(s, "%d/%m/%Y")
     except Exception:
