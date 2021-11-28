@@ -7,7 +7,7 @@ CREATE TABLE `Property` (
   `floor_in_building` int,
   `floor` int,
   `rooms` int,
-  `built_area` float,
+  `built_area` int,
   `furnished` varchar(255),
   `first_listed` datetime,
   `city_id` int
@@ -22,7 +22,7 @@ CREATE TABLE `Price` (
   `id` int PRIMARY KEY,
   `property_id` int,
   `date_of_today` datetime,
-  `price` float
+  `price` int
 );
 
 CREATE TABLE `Cities` (

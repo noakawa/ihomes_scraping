@@ -102,8 +102,12 @@ def get_features(all_data, features, sub_link):
             except ValueError:
                 all_data[feature.text.strip()] = None
         else:
-            all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
-            logging.info(f'{sub_link}: {feature.text.strip()} found')
+            try:
+                all_data[feature.text.strip()] = int(feature.findNext('dd').text.strip())
+                logging.info(f'{sub_link}: {feature.text.strip()} found (integer)')
+            except ValueError:
+                all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
+                logging.info(f'{sub_link}: {feature.text.strip()} found (not integer)')
     return all_data
 
 
