@@ -1,10 +1,12 @@
 import config
 from datetime import datetime
+from datetime import date
 import re
 from currency_converter import CurrencyConverter
 import argparse
 import out_of_scrap
 import logging
+import db_implementation
 
 logging.basicConfig(filename='home.log',
                     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
@@ -154,12 +156,14 @@ def print_output(s, p, d, city):
         for i, soup in enumerate(out_of_scrap.links_to_soup(city_to_slinks[city])):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
-            # print(value)
+            print(value)
+            insert_into_db(value)
             values.append(value)
     return values
 
 
-def main():
+def get_args():
+    """ This function returns the arguments from the command line"""
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--sale_or_rent', help=f"choose from ({','.join(config.OPTIONS)})",
                         choices=config.OPTIONS, default=False)
@@ -173,8 +177,29 @@ def main():
     price = args.max_price
     date = args.min_date
     city = args.cities
+    return [s, price, date, city]
 
-    return print_output(s, price, date, city)
+
+def insert_into_db(data):
+    db_implementation.insert_city(data['City'])
+    city_id = db_implementation.get_city_id(data['City'])
+
+    db_implementation.insert_type(data['Type of property'])
+    type_of_property_id = db_implementation.get_type_of_property_id(data['Type of property'])
+
+    db_implementation.insert_property(data['Link'], data['Sale or Rent ?'],
+                                      type_of_property_id[0][0], data['Floors in building'], data['Floor'],
+                                      data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
+                                      city_id[0][0], data['Condition'])
+
+    property_id = db_implementation.get_property_id()
+    db_implementation.insert_price(property_id[0][0], date.today(), data['Price'])
+
+
+def main():
+    args = get_args()
+    print_output(args[0], args[1], args[2], args[3])
+    db_implementation.commit()
 
 
 if __name__ == '__main__':
