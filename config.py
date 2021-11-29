@@ -5,6 +5,7 @@ HE_TO_EN = {'פנטהאוז': 'Penthouse', 'בית': 'House', 'דירת גן': '
             'משרד': 'Office', 'מיני פנטהוז': 'Mini Penthouse', 'דירה': 'Apartment', 'בנין': 'building', 'חנות': 'Shop'}
 ATTRIBUTES = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms',
               'Built Area', 'Furnished', 'First listed']
+OPTIONS = ['sell', 'rent']
 CITIES = {'r': 'raanana', 'j': 'jerusalem', 'tlv': 'tel-aviv-yafo', 'hrtz': 'herzliya', 'ad': 'ashdod',
           'h': 'haifa', 'n': 'netanya', 'ak': 'ashkelon'}
 
