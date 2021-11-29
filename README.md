@@ -60,6 +60,10 @@ Those variables are called in web_scrap.py and referenced as:
 config.[VARIABLE_NAME]
 ```
 
+* OPTIONS
+
+The options the user select between sell or rent in the command line
+
 * CITIES
 
 A dictionary used to match the inputs values of cities to the cities
@@ -67,7 +71,7 @@ A dictionary used to match the inputs values of cities to the cities
 out_of_scrap.py contain a python code which calls main() and seven other functions
 
 * access_url(response, url)
-This function send a logging to access a url
+This function send a logging to access an url
 
 * url_city(city)
 return the url of the specific city

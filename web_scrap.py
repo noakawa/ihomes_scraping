@@ -90,19 +90,11 @@ def get_features(all_data, features, sub_link):
     for feature in features.find_all('dt'):
         # Translating from hebrew to english
         if feature.text.strip() == 'Type of property':
-            try:
-                all_data[feature.text.strip()] = config.HE_TO_EN[feature.findNext('dd').text.strip()]
-            except KeyError:
-                logging.error(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
-                all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
+            all_data[feature.text.strip()] = get_type_of_property_en(feature, sub_link)
         elif feature.text.strip() == 'First listed':
             all_data['First listed'] = datetime.strptime(feature.findNext('dd').text.strip(), "%d/%m/%Y")
         elif feature.text.strip() == 'Built Area':
-            try:
-                all_data[feature.text.strip()] = \
-                    int(''.join(re.findall('[0-9]+', feature.findNext('dd').text.strip()))[0:-1])
-            except ValueError:
-                all_data[feature.text.strip()] = None
+            all_data[feature.text.strip()] = m2_to_int(feature)
         else:
             try:
                 all_data[feature.text.strip()] = int(feature.findNext('dd').text.strip())
@@ -114,6 +106,25 @@ def get_features(all_data, features, sub_link):
                 all_data[feature.text.strip()] = data
                 logging.info(f'{sub_link}: {feature.text.strip()} found (not integer)')
     return all_data
+
+
+def get_type_of_property_en(feature, sub_link):
+    """ This function returns the translation in english of the type of property """
+    try:
+        data = config.HE_TO_EN[feature.findNext('dd').text.strip()]
+    except KeyError:
+        logging.error(f'{sub_link}: no translation for {feature.findNext("dd").text.strip()}')
+        data = feature.findNext('dd').text.strip()
+    return data
+
+
+def m2_to_int(feature):
+    """ This function keeps the integers from a string """
+    try:
+        data = int(''.join(re.findall('[0-9]+', feature.findNext('dd').text.strip()))[0:-1])
+    except ValueError:
+        data = None
+    return data
 
 
 def subset_data(all_data_n, list_of_attributes, sub_link, city):
@@ -178,12 +189,13 @@ def get_args():
     args = parser.parse_args()
     s = args.sale_or_rent
     price = args.max_price
-    date = args.min_date
+    d = args.min_date
     city = args.cities
-    return [s, price, date, city]
+    return [s, price, d, city]
 
 
 def insert_into_db(data):
+    """ This function inserts the data from a dictionary to the database"""
     db_implementation.insert_city(data['City'])
     city_id = db_implementation.get_city_id(data['City'])
 
