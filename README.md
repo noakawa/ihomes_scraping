@@ -4,10 +4,11 @@ Gather data from iHomes, Israel's real estates online listing.
 
 ## Getting Started
 
-This project contains 5 files: config.py, requirements.txt, web_scrap.py, out_of_scrap.py and README.md
+This project contains 7 files: config.py, requirements.txt, web_scrap.py, out_of_scrap.py, db_creation.py, 
+db_implementation.py, private_info.py and README.md
 
 There are implemented to scrap data from iHomes website 'https://www.ihomes.co.il/s/tel-aviv-yafo' 
-and gather information about properties in Tel Aviv only
+and gather information about properties in cities in Israel
 
 It is implemented using bs4 and grequests 
 
@@ -15,7 +16,7 @@ It is implemented using bs4 and grequests
 
 1. Create a virtual environment
 
-2. Downloads the four files
+2. Downloads the 8 files into a folder
 
 3. Install the packages into your virtual environment from requirements.txt:
 
@@ -23,7 +24,12 @@ It is implemented using bs4 and grequests
 pip install -r requirements.txt
 ```
 
-4. Run web_scrap.py
+4. Fill the file private_info.py with your connection info for mysql
+
+5. Run the following command from terminal to get help of what arguments are necessary
+```
+python3 web_scrap.py -h
+```
 
 ### Implementation of config.py
 
@@ -33,12 +39,6 @@ pip install -r requirements.txt
 * URL 
 
 The url of iHomes website
-
-
-* PAGE: 
-
-The number of web pages from which we'll gather data in this case 51
-'https://www.ihomes.co.il/s/tel-aviv-yafo?page=XX' in the previous url we will replace XX with the page number 1-51
 
 * BATCHES
 
@@ -59,11 +59,15 @@ Those variables are called in web_scrap.py and referenced as:
 ```
 config.[VARIABLE_NAME]
 ```
+
+* CITIES
+
+A dictionary used to match the inputs values of cities to the cities
 ### Implementation out_of_scrap.py
 out_of_scrap.py contain a python code which calls main() and seven other functions
 
 * access_url(response, url)
-This function send a logging for access a url
+This function send a logging to access a url
 
 * url_city(city)
 return the url of the specific city
