@@ -108,7 +108,10 @@ def get_features(all_data, features, sub_link):
                 all_data[feature.text.strip()] = int(feature.findNext('dd').text.strip())
                 logging.info(f'{sub_link}: {feature.text.strip()} found (integer)')
             except ValueError:
-                all_data[feature.text.strip()] = feature.findNext('dd').text.strip()
+                data = feature.findNext('dd').text.strip()
+                if data == 'forms.No':
+                    data = 'No'
+                all_data[feature.text.strip()] = data
                 logging.info(f'{sub_link}: {feature.text.strip()} found (not integer)')
     return all_data
 
@@ -157,7 +160,7 @@ def print_output(s, p, d, city):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
             print(value)
-            insert_into_db(value)
+            # insert_into_db(value)
             values.append(value)
     return values
 
