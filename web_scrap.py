@@ -52,7 +52,7 @@ def price_shekels(price):
     :return: price in shekels
     """
     try:
-        num = int(''.join(re.findall('[0-9]+', price)))
+        num = int(''.join(re.findall('[0-9]+', price.split('-')[0])))
     except ValueError:
         return
     c = CurrencyConverter()
@@ -171,7 +171,7 @@ def print_output(s, p, d, city):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
             print(value)
-            # insert_into_db(value)
+            insert_into_db(value)
             values.append(value)
     return values
 
@@ -207,7 +207,7 @@ def insert_into_db(data):
                                       data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
                                       city_id[0][0], data['Condition'])
 
-    property_id = db_implementation.get_property_id()
+    property_id = db_implementation.get_property_id(data['Link'])
     db_implementation.insert_price(property_id[0][0], date.today(), data['Price'])
 
 
