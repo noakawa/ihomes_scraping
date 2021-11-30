@@ -153,7 +153,7 @@ Insert the input type of property in table
 
 * insert_property(link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
                     furnished, first_listed, city_id, conditions)
-Insert the input features to table Property in the corresponding rows
+Insert the input features to table Property in the corresponding fea
  
  * insert_price(property_id, date_of_today, price)
  Insert to table Price the input features to the corresponding rows
@@ -175,21 +175,21 @@ The DataBase has 4 tables:
 
 1. Property - store information for each property on the website 
   - id - unique identification number of the property; primary key for this table
-  - link - website link ofeach property
-  - sale_or_rent - if the property if for sale or to rent
-  - condition - 
+  - link - website link of each property
+  - sale_or_rent - if the property is for sale or rent
+  - condition - condition of the property
   - type_of_property_id - foreign key to the table Type_of_property with a one to many relation
-  - floor_in_building - how many floor there are in the building of the property
-  - floor
-  - rooms
-  - built_area
-  - furnished
-  -  first_listed
+  - floor_in_building - total number of floors in the building
+  - floor - floor of the property
+  - rooms - number of rooms in the property
+  - built_area - 
+  - furnished - if the property is furnished or not
+  - first_listed - date it was listed for the first time
   - city_id - foreign key to the table City with a one to many relation
  
 2. Type_of_property 
   - id - unique id for each type of property; primary key for this table
-  - type - name of type 
+  - type - type of property 
 
 3.  Price - store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
   - id - unique id for each type of property; primary key for this table
