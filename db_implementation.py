@@ -66,7 +66,7 @@ def insert_price(property_id, date_of_today, price):
     to the input property id and update the date of today according to the input date_of_today.
     :param property_id: id of the property
     :param date_of_today: today's date
-    :param price: price of the property 
+    :param price: price of the property
     """
 
     if len(get_price_id(property_id, price)) == 0:
@@ -129,5 +129,4 @@ def get_price_id(property_id, price):
 def commit():
     mydb.commit()
 
-# data = os.system("python web_scrap.py -c ak")
-# print(data)
+

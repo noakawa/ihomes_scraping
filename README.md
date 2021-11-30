@@ -215,54 +215,55 @@ The DataBase has 4 tables:
   - id :  unique identification number of the property; primary key for this table
   - link :  website link of each property
   - sale_or_rent : if the property is for sale or rent
+    - Sell
+    - Rent
   - condition : condition of the property
-              New
-              Old
-              
   - type_of_property_id : foreign key to the table Type_of_property with a one to many relation
   - floor_in_building: total number of floors in the building
   - floor: floor of the property
   - rooms: number of rooms in the property
   - built_area: gross area of the property in m^2 
   - furnished: if the property is furnished or not
+    - Yes
+    - No
   - first_listed: date the property was listed for the first time
   - city_id: foreign key to the table City with a one to many relation
  
 2. Type_of_property 
   - id: unique id for each type of property; primary key for this table
   - type: type of property 
-        Penthouse
-        House
-        Garden Apartment
-        Duplex
-        Semi-detatched
-        Villa
-        Cottage
-        Plot
-        Studio
-        Office
-        Mini Penthouse
-        Apartment
-        building
-        Shop
+    - Penthouse
+    - House
+    - Garden Apartment
+    - Duplex
+    - Semi-detatched
+    - Villa
+    - Cottage
+    - Plot
+    - Studio
+    - Office
+    - Mini Penthouse
+    - Apartment
+    - building
+    - Shop
 
 3.  Price: store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
   - id: unique id for each type of property; primary key for this table
   - property_id: foreign key to the table Pice; it's a one to many relation tothe table Propety
-  - date_of_today 
+  - date_of_today: the date of today
   - price: price for the property according to property_id
 
 4. Cities : in this table we'll store the name of each city were the property is located. 
  - id: unique id for each city; primary key for this table
  - city_name: name of city
-            raanana
-            jerusalem
-            tel-aviv-yafo
-            herzliya
-            ashdod
-            haifa
-            netanya
-            ashkelon
+   - raanana
+   - jerusalem
+   - tel-aviv-yafo
+   - herzliya
+   - ashdod
+   - haifa
+   - netanya
+   - ashkelon
  
 ### ERD_ihomes.sql
 
