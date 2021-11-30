@@ -1,5 +1,10 @@
 import mysql.connector
 import private_info
+import logging
+
+logging.basicConfig(filename='home.log',
+                    format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
+                    level=logging.INFO)
 
 mydb = mysql.connector.connect(
     host=private_info.HOST,
@@ -21,7 +26,9 @@ def insert_city(city):
         mycursor.execute(''' INSERT INTO Cities 
             (city_name)
             VALUES ('%s')''' % city)
+        logging.info(f'{city} inserted')
     else:
+        logging.info(f'{city} already in data base')
         return
 
 
@@ -35,7 +42,9 @@ def insert_type(type_of_property):
         mycursor.execute(''' INSERT INTO Type_of_property
             (type)
             VALUES ('%s')''' % type_of_property)
+        logging.info(f'{type_of_property} inserted')
     else:
+        logging.info(f'{type_of_property} already in data base')
         return
 
 
@@ -56,7 +65,9 @@ def insert_property(link, sale_or_rent, type_of_property_id, floor_in_building, 
             furnished, first_listed, city_id, conditions
         )
         mycursor.execute(query, record)
+        logging.info(f"property with link '{link}' inserted")
     else:
+        logging.info(f"property with link '{link}' already in data base")
         return
 
 
@@ -75,7 +86,9 @@ def insert_price(property_id, date_of_today, price):
             VALUES (%s, %s, %s)'''
         record = (property_id, date_of_today, price)
         mycursor.execute(query, record)
+        logging.info(f'price for property id {property_id} inserted')
     else:
+        logging.info(f"price for property id {property_id}' already in data base")
         return
 
 

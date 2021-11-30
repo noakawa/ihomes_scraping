@@ -16,9 +16,11 @@ mycursor = mydb.cursor()
 
 try:
     mycursor.execute("CREATE DATABASE ihomes")
+    logging.info("Database created successfully")
 except mysql.connector.errors.DatabaseError:
     mycursor.execute("DROP DATABASE ihomes")
     mycursor.execute("CREATE DATABASE ihomes")
+    logging.info("Database recreated successfully")
 
 mycursor.execute("USE ihomes")
 
