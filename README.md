@@ -188,18 +188,18 @@ The DataBase has 4 tables:
   - city_id - foreign key to the table City with a one to many relation
  
 2. Type_of_property 
-  a. id - unique id for each type of property; primary key for this table
-  b. type - name of type 
+  - id - unique id for each type of property; primary key for this table
+  - type - name of type 
 
 3.  Price - store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
-  a. id - unique id for each type of property; primary key for this table
-  b. property_id - foreign key to the table Pice; it's a one to many relation tothe table Propety
-  c. date_of_today 
-  d. price - price for the property according to property_id
+  - id - unique id for each type of property; primary key for this table
+  - property_id - foreign key to the table Pice; it's a one to many relation tothe table Propety
+  - date_of_today 
+  - price - price for the property according to property_id
 
 4. Cities - in this table we'll store the name of each city were the property is located 
- a. id- unique id for each city; primary key for this table
- b. city_name 
+ - id- unique id for each city; primary key for this table
+ - city_name 
  
 ### ERD_ihomes.sql
 
