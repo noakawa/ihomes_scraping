@@ -13,8 +13,10 @@ mycursor = mydb.cursor()
 
 
 def insert_city(city):
-    """input: city name
-    Insert city in table City in row city_name"""
+    """
+    This functions inserts a row in the table City if the city does not exist.
+    :param city: name of the city
+    """
     
     if len(get_city_id(city)) == 0:
         mycursor.execute(''' INSERT INTO Cities 
