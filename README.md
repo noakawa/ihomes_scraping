@@ -174,18 +174,18 @@ Insert the input features to table Property in the corresponding rows
 The DataBase has 4 tables:
 
 1. Property - store information for each property on the website 
-  a. id - unique identification number of the property; primary key for this table
-  b. link - website link ofeach property
-  c. sale_or_rent - if the property if for sale or to rent
-  d. condition - 
-  e. type_of_property_id - foreign key to the table Type_of_property with a one to many relation
-  f. floor_in_building - how many floor there are in the building of the property
-  g. floor
-  h. rooms
-  i. built_area
-  j. furnished
-  k.  first_listed
-  l. city_id - foreign key to the table City with a one to many relation
+  - id - unique identification number of the property; primary key for this table
+  - link - website link ofeach property
+  - sale_or_rent - if the property if for sale or to rent
+  - condition - 
+  - type_of_property_id - foreign key to the table Type_of_property with a one to many relation
+  - floor_in_building - how many floor there are in the building of the property
+  - floor
+  - rooms
+  - built_area
+  - furnished
+  -  first_listed
+  - city_id - foreign key to the table City with a one to many relation
  
 2. Type_of_property 
   a. id - unique id for each type of property; primary key for this table
