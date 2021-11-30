@@ -26,7 +26,12 @@ pip install -r requirements.txt
 
 4. Fill the file private_info.py with your connection info for mysql
 
-5. Run the following command from terminal to get help of what arguments are necessary
+5. Run the following command to create the database
+```
+python3 db_creation.py 
+```
+
+6. Run the following command from terminal to get help of what arguments are necessary
 ```
 python3 web_scrap.py -h
 ```
