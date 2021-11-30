@@ -191,7 +191,7 @@ The DataBase has 4 tables:
   a. id - unique id for each type of property; primary key for this table
   b. type - name of type 
 
-3.  Price - store the price of each property and the curent date of price estimation
+3.  Price - store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
   a. id - unique id for each type of property; primary key for this table
   b. property_id - foreign key to the table Pice; it's a one to many relation tothe table Propety
   c. date_of_today 
