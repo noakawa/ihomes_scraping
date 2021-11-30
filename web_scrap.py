@@ -156,6 +156,7 @@ def valid_date(s):
 
 
 def print_output(s, p, d, city):
+    """ This function prints the output to the screen and call the function to write in the database """
     city_to_slinks = dict()
     values = []
     if not city:
