@@ -67,7 +67,17 @@ The options the user select between sell or rent in the command line
 * CITIES
 
 A dictionary used to match the inputs values of cities to the cities
+
+### Implementation private_info.py
+
+private_info.py contains the required informations to establish a connection with MySQL.
+
+* HOST
+* USER
+* ROOT
+
 ### Implementation out_of_scrap.py
+
 out_of_scrap.py contain a python code which calls main() and seven other functions
 
 * access_url(response, url)
@@ -123,6 +133,43 @@ print the data
 
 In addition, the code will create a file home.log with the logging and stdout.log with the output.
 
+### Implementation db_creation.py
+
+db_creation.py creates, using Mysql queries a database with four tables.
+First it establish a connection with MySQL, then creates a new database.
+
+You need to have access to the root user, in order to creates and implement the MySQL database. 
+
+We used private_informaton to store our information in a private file, however you should use your own login information to run the code.
+
+### Implementation db_implementation.py
+Write the data we scrap into the MySQL database created in db_creation.py using 4 functions.
+
+* insert_city(city)
+Insert the name of the input city in table City in row city_name.
+
+* insert_type(type_of_property)
+Insert the input type of property in table
+
+* insert_property(link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
+                    furnished, first_listed, city_id, conditions)
+Insert the input features to table Property in the corresponding rows
+ 
+ * insert_price(property_id, date_of_today, price)
+ Insert to table Price the input features to the corresponding rows
+ 
+ * get_city_id(city)
+ Return the id of the input city from table Cities
+ 
+ * def get_type_of_property_id(prop_type)
+ Return the id of the input type of preperty from table Type_of_property
+ 
+ * get_property_id(link)
+ Retrun the property id that correspond to the given link in table Property
+ 
+ * get_price_id(property_id, price)
+ Return the id from table Price that correspond to the given price and property id
+
 ### Data Base 
 The DataBase has 4 tables:
 
@@ -153,6 +200,11 @@ The DataBase has 4 tables:
 4. Cities - in this table we'll store the name of each city were the property is located 
  a. id- unique id for each city; primary key for this table
  b. city_name 
+ 
+### ERD_ihomes.sql
+
+MySQL code that creates our database structure
+4 tables : Property, Type_of_property, Price and Cities
 
 ## Authors
 
