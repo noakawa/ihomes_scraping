@@ -81,55 +81,83 @@ private_info.py contains the required informations to establish a connection wit
 out_of_scrap.py contain a python code which calls main() and seven other functions
 
 * access_url(response, url)
+
 This function send a logging to access an url
 
 * url_city(city)
-return the url of the specific city
+
+This function returns the url of the specific city
 
 * list_url_cities(cities)
-return a list of urls for each city according to the input list of cities
+
+This function returns a list of urls for each city according to the input list of cities.
 
 * max_pages(city)
-input the nameof a city to scrap and return the maximum number of pages of link
+
+This function get as input the name of a city to scrap and return the maximum number of pages of link.
 
 * pages_to_list(city, no_of_page)
-return a list of links of pages in the website depending on the input number and name of the city
+
+This function returns a list of links of pages in the website depending on the input number and name of the city.
 
 * links_to_soup(urls, batches=config.BATCHES)
-will return a list of soup
-objects for each input urls, using grequest and the input batches number
+
+This function will return a list of soup objects for each input urls, using grequest and the input batches number.
 
 * get_sub_page(urls, batches=config.BATCHES)
+
 This function receives the links of all pages and returns a list of all subpages urls.
 Using grequest and the input batches number to open the pages.
 
 ### Implementation web_scrap.py
 
-web_scrap.py contain a python code which calls main() and seven other functions
+web_scrap.py contain a python code which calls main(), get the arguments from the users and use 11 other functions to scrap the required data.
 
 * get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date=False)
 
-get the subpage urls and return a dictionary with all the data for the list of attributes. 
+This function gets the subpage urls and return a dictionary with all the data for the list of attributes. 
 If no list_of_attributes given, automatically return all the attributes found.
 If no data are available for a specific attribute the function will describe it as None.
 
 * price_shekels(price)
-convert every prices in shekel
+
+This function converts every prices in shekel.
 
 * get_price(soup, all_data, sub_link)
-returns a dictionary updated with the prices all in shekel
+
+This function returns a dictionary updated with the prices (all in shekel).
 
 * get_features(all_data, features, sub_link)
-returns the dictionary updated with the features
+
+This function returns the dictionary updated with the features.
+
+* get_type_of_property_en(feature, sub_link)
+
+This function returns the translation in english of the type of property
+
+* m2_to_int(feature)
+
+This function keeps the integers from a string.
 
 * subset_data(all_data_n, list_of_attributes, sub_link, city)
-returns a dictionary with the specific data asked
+
+This function returns a dictionary with the specific data asked.
 
 * valid_date(s)
-raise an error if the format of the input date is not correct
+
+This function will raise an error if the format of input date is incorrect.
 
 * print_output(s, p, d, city)
-print the data 
+
+This function print the scraped data. 
+
+* get_args()
+
+This function returns the arguments from the command line
+
+* insert_into_db(data)
+
+This function inserts the data from a dictionary to the database
 
 In addition, the code will create a file home.log with the logging and stdout.log with the output.
 
@@ -143,68 +171,102 @@ You need to have access to the root user, in order to creates and implement the 
 We used private_informaton to store our information in a private file, however you should use your own login information to run the code.
 
 ### Implementation db_implementation.py
-Write the data we scrap into the MySQL database created in db_creation.py using 4 functions.
+
+Insert the data we scrap into the MySQL database created in db_creation.py using 8 functions.
 
 * insert_city(city)
-Insert the name of the input city in table City in row city_name.
+
+This functions inserts a row in the table City if the city does not exist
 
 * insert_type(type_of_property)
-Insert the input type of property in table
+
+This functions inserts a row in the table Type_of_property if the type_of_property does not exist.
 
 * insert_property(link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
                     furnished, first_listed, city_id, conditions)
-Insert the input features to table Property in the corresponding fea
+                    
+This functions inserts a row in the table Property if the property that corresponds to the link does not exist in the table.
  
  * insert_price(property_id, date_of_today, price)
- Insert to table Price the input features to the corresponding rows
+ 
+ This functions inserts a row in the table Price if the input price is different from the price that corresponds to the input property id 
+ and update the date of today according to the input date_of_today.
  
  * get_city_id(city)
- Return the id of the input city from table Cities
+ 
+ This functions returns the id of the input city from table Cities
  
  * def get_type_of_property_id(prop_type)
- Return the id of the input type of preperty from table Type_of_property
+ 
+ This functions return the id from table Type_of_property according to the given type of property.
  
  * get_property_id(link)
- Retrun the property id that correspond to the given link in table Property
+ 
+ This functions return the id from table Property according to the given type of link.
  
  * get_price_id(property_id, price)
- Return the id from table Price that correspond to the given price and property id
+ 
+ This functions return the id from table Price according to the given property id and price.
 
 ### Data Base 
 The DataBase has 4 tables:
 
-1. Property - store information for each property on the website 
-  - id - unique identification number of the property; primary key for this table
-  - link - website link of each property
-  - sale_or_rent - if the property is for sale or rent
-  - condition - condition of the property
-  - type_of_property_id - foreign key to the table Type_of_property with a one to many relation
-  - floor_in_building - total number of floors in the building
-  - floor - floor of the property
-  - rooms - number of rooms in the property
-  - built_area - 
-  - furnished - if the property is furnished or not
-  - first_listed - date it was listed for the first time
-  - city_id - foreign key to the table City with a one to many relation
+1. Property - store information for each property. 
+  - id :  unique identification number of the property; primary key for this table
+  - link :  website link of each property
+  - sale_or_rent : if the property is for sale or rent
+  - condition : condition of the property
+              New
+              Old
+              
+  - type_of_property_id : foreign key to the table Type_of_property with a one to many relation
+  - floor_in_building: total number of floors in the building
+  - floor: floor of the property
+  - rooms: number of rooms in the property
+  - built_area: gross area of the property in m^2 
+  - furnished: if the property is furnished or not
+  - first_listed: date the property was listed for the first time
+  - city_id: foreign key to the table City with a one to many relation
  
 2. Type_of_property 
-  - id - unique id for each type of property; primary key for this table
-  - type - type of property 
+  - id: unique id for each type of property; primary key for this table
+  - type: type of property 
+        Penthouse
+        House
+        Garden Apartment
+        Duplex
+        Semi-detatched
+        Villa
+        Cottage
+        Plot
+        Studio
+        Office
+        Mini Penthouse
+        Apartment
+        building
+        Shop
 
-3.  Price - store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
-  - id - unique id for each type of property; primary key for this table
-  - property_id - foreign key to the table Pice; it's a one to many relation tothe table Propety
+3.  Price: store the price of each property and the curent date of price estimation. Every time the prices change it adds a row with new price and the date.
+  - id: unique id for each type of property; primary key for this table
+  - property_id: foreign key to the table Pice; it's a one to many relation tothe table Propety
   - date_of_today 
-  - price - price for the property according to property_id
+  - price: price for the property according to property_id
 
-4. Cities - in this table we'll store the name of each city were the property is located 
- - id- unique id for each city; primary key for this table
- - city_name 
+4. Cities : in this table we'll store the name of each city were the property is located. 
+ - id: unique id for each city; primary key for this table
+ - city_name: name of city
+            raanana
+            jerusalem
+            tel-aviv-yafo
+            herzliya
+            ashdod
+            haifa
+            netanya
+            ashkelon
  
 ### ERD_ihomes.sql
 
-MySQL code that creates our database structure
-4 tables : Property, Type_of_property, Price and Cities
+MySQL code that creates our database structure.
 
 ## Authors
 
