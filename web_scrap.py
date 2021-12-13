@@ -201,7 +201,7 @@ def print_output(s, p, d, city):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
             print(value)
-            # insert_into_db(value)
+            insert_into_db(value)
             values.append(value)
     return values
 
@@ -226,25 +226,25 @@ def get_args():
 
 def insert_into_db(data):
     """ This function inserts the data from a dictionary to the database"""
-    db_implementation.insert_city(data['City'])
-    city_id = db_implementation.get_city_id(data['City'])
+    db = db_implementation.Database()
+    db.insert_city(data['City'])
+    city_id = db.get_city_id(data['City'])
 
-    db_implementation.insert_type(data['Type of property'])
-    type_of_property_id = db_implementation.get_type_of_property_id(data['Type of property'])
+    db.insert_type(data['Type of property'])
+    type_of_property_id = db.get_type_of_property_id(data['Type of property'])
 
-    db_implementation.insert_property(data['Link'], data['Sale or Rent ?'],
-                                      type_of_property_id[0][0], data['Floors in building'], data['Floor'],
-                                      data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
-                                      city_id[0][0], data['Condition'])
+    db.insert_property(data['Link'], data['Sale or Rent ?'],
+                       type_of_property_id[0][0], data['Floors in building'], data['Floor'],
+                       data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
+                       city_id[0][0], data['Condition'])
 
-    property_id = db_implementation.get_property_id(data['Link'])
-    db_implementation.insert_price(property_id[0][0], date.today(), data['Price'])
-
+    property_id = db.get_property_id(data['Link'])
+    db.insert_price(property_id[0][0], date.today(), data['Price'])
+    db.commit()
 
 def main():
     args = get_args()
     print_output(args[0], args[1], args[2], args[3])
-    db_implementation.commit()
 
 
 if __name__ == '__main__':
