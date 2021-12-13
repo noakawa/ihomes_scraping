@@ -12,7 +12,8 @@ CREATE TABLE `Property` (
   `first_listed` datetime,
   `city_id` int,
   `longitude` float,
-  `latitude` float
+  `latitude` float,
+  `number_of_restaurant` int
 );
 
 CREATE TABLE `Type_of_property` (
