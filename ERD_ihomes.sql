@@ -10,7 +10,9 @@ CREATE TABLE `Property` (
   `built_area` int,
   `furnished` varchar(255),
   `first_listed` datetime,
-  `city_id` int
+  `city_id` int,
+  `longitude` float,
+  `latitude` float
 );
 
 CREATE TABLE `Type_of_property` (
@@ -22,7 +24,7 @@ CREATE TABLE `Type_of_property` (
   `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `property_id` int,
   `date_of_today` datetime,
-  `price` int
+  `price` float
 );
 
 CREATE TABLE `Cities` (
