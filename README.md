@@ -4,8 +4,8 @@ Gather data from iHomes, Israel's real estates online listing.
 
 ## Getting Started
 
-This project contains 7 files: config.py, requirements.txt, web_scrap.py, out_of_scrap.py, db_creation.py, 
-db_implementation.py, private_info.py and README.md
+This project contains 8 files: config.py, requirements.txt, web_scrap.py, out_of_scrap.py, db_creation.py, 
+db_implementation.py, private_info.py, ERD_ihomes.sql and README.md
 
 There are implemented to scrap data from iHomes website 'https://www.ihomes.co.il/s/tel-aviv-yafo' 
 and gather information about properties in cities in Israel
@@ -73,6 +73,10 @@ The options the user select between sell or rent in the command line
 
 A dictionary used to match the inputs values of cities to the cities
 
+* RADIUS
+
+Defines the distance (in meters) within which to return the number of restaurants around the given propertie.
+
 ### Implementation private_info.py
 
 private_info.py contains the required informations to establish a connection with MySQL.
@@ -116,7 +120,7 @@ Using grequest and the input batches number to open the pages.
 
 ### Implementation web_scrap.py
 
-web_scrap.py contain a python code which calls main(), get the arguments from the users and use 11 other functions to scrap the required data.
+web_scrap.py contain a python code which calls main(), get the arguments from the users and use 13 other functions to scrap the required data.
 
 * get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date=False)
 
@@ -131,6 +135,10 @@ This function converts every prices in shekel.
 * get_price(soup, all_data, sub_link)
 
 This function returns a dictionary updated with the prices (all in shekel).
+
+* get_ll(soup, all_data, sub_link)
+
+This function returns the dictionary updated with the longitude and latitude of a property.
 
 * get_features(all_data, features, sub_link)
 
@@ -158,11 +166,15 @@ This function print the scraped data.
 
 * get_args()
 
-This function returns the arguments from the command line
+This function returns the arguments from the command line.
+
+* get_number_of_restaurants(latitude, longitude, radius)
+
+This function returns the number of restaurant in a certain radius around a point defined by its latitude and longitude.
 
 * insert_into_db(data)
 
-This function inserts the data from a dictionary to the database
+This function inserts the data from a dictionary to the database calling the Database class.
 
 In addition, the code will create a file home.log with the logging and stdout.log with the output.
 
@@ -177,39 +189,48 @@ We used private_informaton to store our information in a private file, however y
 
 ### Implementation db_implementation.py
 
-Insert the data we scrap into the MySQL database created in db_creation.py using 8 functions.
+Create a class Database which has 10 functions.
+This class is implemented to insert the data we scrap into the MySQL database created in db_creation.py.
 
-* insert_city(city)
+* __init__(self):
+
+Creates a mysql connector and a cursor.
+
+* commit(self)
+
+Commit the inserts queries to makes the changes of the database permanent and visible.
+
+* insert_city(self, city)
 
 This functions inserts a row in the table City if the city does not exist
 
-* insert_type(type_of_property)
+* insert_type(self, type_of_property)
 
 This functions inserts a row in the table Type_of_property if the type_of_property does not exist.
 
-* insert_property(link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
+* insert_property(self, link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
                     furnished, first_listed, city_id, conditions)
                     
 This functions inserts a row in the table Property if the property that corresponds to the link does not exist in the table.
  
- * insert_price(property_id, date_of_today, price)
+ * insert_price(self, property_id, date_of_today, price)
  
  This functions inserts a row in the table Price if the input price is different from the price that corresponds to the input property id 
  and update the date of today according to the input date_of_today.
  
- * get_city_id(city)
+ * get_city_id(self, city)
  
  This functions returns the id of the input city from table Cities
  
- * def get_type_of_property_id(prop_type)
+ * def get_type_of_property_id(self, prop_type)
  
  This functions return the id from table Type_of_property according to the given type of property.
  
- * get_property_id(link)
+ * get_property_id(self, link)
  
  This functions return the id from table Property according to the given type of link.
  
- * get_price_id(property_id, price)
+ * get_price_id(self, property_id, price)
  
  This functions return the id from table Price according to the given property id and price.
 
@@ -233,6 +254,9 @@ The DataBase has 4 tables:
     - No
   - first_listed: date the property was listed for the first time
   - city_id: foreign key to the table City with a one to many relation
+  - longitude: of the point representing the property
+  - latitude: of the point representing the property
+  - number_of_restaurant: number of restaurant around the property within a radius of 500 meters.
  
 2. Type_of_property 
   - id: unique id for each type of property; primary key for this table
