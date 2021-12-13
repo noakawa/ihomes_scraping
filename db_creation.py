@@ -36,7 +36,9 @@ mycursor.execute(''' CREATE TABLE `Property` (
   `built_area` int,
   `furnished` varchar(255),
   `first_listed` datetime,
-  `city_id` int
+  `city_id` int,
+  `longitude` float,
+  `latitude` float
 ) ''')
 print("Table created successfully")
 logging.info("Table 'Property' created successfully")
@@ -52,7 +54,7 @@ mycursor.execute(''' CREATE TABLE `Price` (
   `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `property_id` int,
   `date_of_today` datetime,
-  `price` int
+  `price` float
 ) ''')
 print("Table created successfully")
 logging.info("Table 'Price' created successfully")
