@@ -36,6 +36,7 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
         all_data = get_price(soup, all_data, sub_link)
         if max_price and all_data['Price'] > max_price:
             return
+        all_data = get_ll(soup, all_data, sub_link)
     except AttributeError:
         logging.error(f'{sub_link}: additional features including description not found')
 
@@ -76,6 +77,34 @@ def get_price(soup, all_data, sub_link):
         logging.info(f'{sub_link}: price found')
     except AttributeError:
         logging.error(f'{sub_link}: no price found')
+    return all_data
+
+
+def get_ll(soup, all_data, sub_link):
+    """
+    This function returns the dictionary updated with the longitude and latitude
+    :param soup: link converted to soup
+    :param all_data: previous dictionary
+    :param sub_link: link of the house
+    :return: all_data updated
+    """
+    data_longitude = None
+    data_latitude = None
+    for script in soup.find_all('script'):
+        longitude = re.findall('var longitude = .*', str(script))
+        latitude = re.findall('var latitude = .*', str(script))
+        if len(latitude) != 0 and len(longitude) != 0:
+            try:
+                data_longitude = float(''.join(re.findall('[0-9]+\.*[0-9]*', longitude[0])))
+                data_latitude = float(''.join(re.findall('[0-9]+\.*[0-9]*', latitude[0])))
+                logging.info(f'{sub_link}: longitude and latitude found')
+                break
+            except ValueError:
+                logging.error(f'{sub_link}: longitude and latitude not in wanted format')
+    if data_longitude is None or data_latitude is None:
+        logging.info(f'{sub_link}: no longitude and latitude found')
+    all_data['Longitude'] = data_longitude
+    all_data['Latitude'] = data_latitude
     return all_data
 
 
@@ -172,7 +201,7 @@ def print_output(s, p, d, city):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
             print(value)
-            insert_into_db(value)
+            #insert_into_db(value)
             values.append(value)
     return values
 
