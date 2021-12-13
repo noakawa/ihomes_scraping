@@ -8,6 +8,6 @@ ATTRIBUTES = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floor
 OPTIONS = ['sell', 'rent']
 CITIES = {'r': 'raanana', 'j': 'jerusalem', 'tlv': 'tel-aviv-yafo', 'hrtz': 'herzliya', 'ad': 'ashdod',
           'h': 'haifa', 'n': 'netanya', 'ak': 'ashkelon'}
-
+RADIUS = 500
 
 

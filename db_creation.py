@@ -38,7 +38,8 @@ mycursor.execute(''' CREATE TABLE `Property` (
   `first_listed` datetime,
   `city_id` int,
   `longitude` float,
-  `latitude` float
+  `latitude` float,
+  `number_of_restaurant` int
 ) ''')
 print("Table created successfully")
 logging.info("Table 'Property' created successfully")

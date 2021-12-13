@@ -53,7 +53,7 @@ class Database:
             return
 
     def insert_property(self, link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
-                        furnished, first_listed, city_id, conditions, latitude, longitude):
+                        furnished, first_listed, city_id, conditions, latitude, longitude, number_of_restaurant):
         """
         This functions inserts a row in the table Property if the property that corresponds to the link does not exist in
         the table.
@@ -62,11 +62,11 @@ class Database:
         if len(self.get_property_id(link)) == 0:
             query = ''' INSERT INTO Property 
             (link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
-                            furnished, first_listed, city_id, conditions, latitude, longitude)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+                            furnished, first_listed, city_id, conditions, latitude, longitude, number_of_restaurant)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
             record = (
                 link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
-                furnished, first_listed, city_id, conditions, latitude, longitude
+                furnished, first_listed, city_id, conditions, latitude, longitude, number_of_restaurant
             )
             self.mycursor.execute(query, record)
             logging.info(f"property with link '{link}' inserted")
@@ -136,4 +136,3 @@ class Database:
                         WHERE property_id = ('%s') and price = ('%s') ''' % (property_id, price))
 
         return self.mycursor.fetchall()
-
