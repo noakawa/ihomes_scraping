@@ -53,14 +53,14 @@ def price_shekels(price):
     :return: price in shekels
     """
     try:
-        num = int(''.join(re.findall('[0-9]+', price.split('-')[0])))
+        num = float(''.join(re.findall('[0-9]+', price.split('-')[0])))
     except ValueError:
         return
     c = CurrencyConverter()
     if price[0] == '$':
-        return int(c.convert(num, 'USD', 'ILS'))
+        return float(c.convert(num, 'USD', 'ILS'))
     else:
-        return int(num)
+        return float("%.2f" % float(num))
 
 
 def get_price(soup, all_data, sub_link):
@@ -201,7 +201,7 @@ def print_output(s, p, d, city):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d)
             print(value)
-            #insert_into_db(value)
+            # insert_into_db(value)
             values.append(value)
     return values
 
