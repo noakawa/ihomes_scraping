@@ -236,7 +236,7 @@ def insert_into_db(data):
     db.insert_property(data['Link'], data['Sale or Rent ?'],
                        type_of_property_id[0][0], data['Floors in building'], data['Floor'],
                        data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
-                       city_id[0][0], data['Condition'])
+                       city_id[0][0], data['Condition'], data['Latitude'], data['Longitude'])
 
     property_id = db.get_property_id(data['Link'])
     db.insert_price(property_id[0][0], date.today(), data['Price'])
