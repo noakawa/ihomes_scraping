@@ -17,7 +17,7 @@ logging.basicConfig(filename='home.log',
                     level=logging.INFO)
 
 
-def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date=False):
+def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date=False, radius=False):
     """
     This function get the subpage and return a dictionary with all the all_data for the list of attributes
     :param city: city of the data
@@ -26,6 +26,7 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
     :param sell_or_rent: False if we take sell and rent, value otherwise
     :param max_price: maximum price to list
     :param min_date: minimum date when listed
+    :param radius: radius to calculate number of restaurants
     :return: dictionary with all all all_data of a sub_page
     """
 
@@ -41,8 +42,12 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
         if max_price and all_data['Price'] > max_price:
             return
         all_data = get_ll(soup, all_data, sub_link)
+        r = config.RADIUS
+        if radius:
+            r = radius
+        all_data = get_number_of_restaurants(all_data['Latitude'], all_data['Longitude'], r, all_data, sub_link)
     except AttributeError:
-        logging.error(f'{sub_link}: additional features including description not found')
+        logging.error(f'{sub_link}: no data')
 
     # Replacing empty string by None
     all_data_n = {k: None if not v else v for k, v in all_data.items()}
@@ -109,6 +114,24 @@ def get_ll(soup, all_data, sub_link):
         logging.info(f'{sub_link}: no longitude and latitude found')
     all_data['Longitude'] = data_longitude
     all_data['Latitude'] = data_latitude
+    return all_data
+
+
+def get_number_of_restaurants(latitude, longitude, radius, all_data, sub_link):
+    """
+    This function returns the number of restaurant in a certain radius around a point
+    :param latitude: latitude of the point
+    :param longitude: longitude of the point
+    :param radius: radius to get the number of restaurants
+    :param all_data: previous dictionary
+    :param sub_link: link of the house
+    :return: data including number of restaurants
+    """
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude}%2C{longitude}&radius={radius}&type=restaurant&key={private_info.KEY} "
+    payload = {}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    all_data['Number_of_restaurant'] = len(json.loads(response.text)['results'])
     return all_data
 
 
@@ -188,7 +211,7 @@ def valid_date(s):
         raise argparse.ArgumentTypeError(msg)
 
 
-def print_output(s, p, d, city):
+def print_output(s, p, d, city, radius):
     """ This function prints the output to the screen and call the function to write in the database """
     city_to_slinks = dict()
     values = []
@@ -203,7 +226,7 @@ def print_output(s, p, d, city):
     for city in city_to_slinks:
         for i, soup in enumerate(out_of_scrap.links_to_soup(city_to_slinks[city])):
             value = get_data(city, soup, city_to_slinks[city][i],
-                             sell_or_rent=s, max_price=p, min_date=d)
+                             sell_or_rent=s, max_price=p, min_date=d, radius=radius)
             print(value)
             insert_into_db(value)
             values.append(value)
@@ -220,27 +243,15 @@ def get_args():
                         type=valid_date, default=False)
     parser.add_argument('-c', '--cities', help=f"choose from the keys : {config.CITIES}", choices=config.CITIES.keys(),
                         default=False)
+    parser.add_argument('-r', '--radius', type=int, help=f"radius to calculate the numer of restaurants",
+                        default=False)
     args = parser.parse_args()
     s = args.sale_or_rent
     price = args.max_price
     d = args.min_date
     city = args.cities
-    return [s, price, d, city]
-
-
-def get_number_of_restaurants(latitude, longitude, radius):
-    """
-    This function returns the number of restaurant in a certain radius around a point
-    :param latitude: latitude of the point
-    :param longitude: longitude of the point
-    :param radius: radius to get the number of restaurants
-    :return: number of restaurants
-    """
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude}%2C{longitude}&radius={radius}&type=restaurant&key={private_info.KEY} "
-    payload = {}
-    headers = {}
-    response = requests.request("GET", url, headers=headers, data=payload)
-    return len(json.loads(response.text)['results'])
+    radius = args.radius
+    return [s, price, d, city, radius]
 
 
 def insert_into_db(data):
@@ -251,12 +262,11 @@ def insert_into_db(data):
 
     db.insert_type(data['Type of property'])
     type_of_property_id = db.get_type_of_property_id(data['Type of property'])
-    number_of_restaurant = get_number_of_restaurants(data['Latitude'], data['Longitude'], config.RADIUS)
 
     db.insert_property(data['Link'], data['Sale or Rent ?'],
                        type_of_property_id[0][0], data['Floors in building'], data['Floor'],
                        data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
-                       city_id[0][0], data['Condition'], data['Latitude'], data['Longitude'], number_of_restaurant)
+                       city_id[0][0], data['Condition'], data['Latitude'], data['Longitude'], data['Number_of_restaurant'])
 
     property_id = db.get_property_id(data['Link'])
     db.insert_price(property_id[0][0], date.today(), data['Price'])
@@ -265,7 +275,7 @@ def insert_into_db(data):
 
 def main():
     args = get_args()
-    print_output(args[0], args[1], args[2], args[3])
+    print_output(args[0], args[1], args[2], args[3], args[4])
 
 
 if __name__ == '__main__':
