@@ -46,7 +46,11 @@ def max_pages(city):
     access_url(page, url)
     soup = BeautifulSoup(page.text, 'html.parser')
     p = soup.find(class_="page-pagination")
-    pages = p.findAll(class_="page-item")
+    try:
+        pages = p.findAll(class_="page-item")
+    except AttributeError:
+        logging.critical("Website out of service")
+        return
     return int(pages[-2].text)
 
 
