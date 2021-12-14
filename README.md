@@ -79,11 +79,12 @@ Defines the distance (in meters) within which to return the number of restaurant
 
 ### Implementation private_info.py
 
-private_info.py contains the required informations to establish a connection with MySQL.
+private_info.py contains the required information to establish a connection with MySQL. It also contains a KEY to connect to the Google API
 
 * HOST
 * USER
 * ROOT
+* KEY
 
 ### Implementation out_of_scrap.py
 
@@ -209,7 +210,7 @@ This functions inserts a row in the table City if the city does not exist
 This functions inserts a row in the table Type_of_property if the type_of_property does not exist.
 
 * insert_property(self, link, sale_or_rent, type_of_property_id, floor_in_building, floor, rooms, built_area,
-                    furnished, first_listed, city_id, conditions)
+                    furnished, first_listed, city_id, conditions, latitude, longitude, number_of_restaurant)
                     
 This functions inserts a row in the table Property if the property that corresponds to the link does not exist in the table.
  
