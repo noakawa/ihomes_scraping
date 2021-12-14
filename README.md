@@ -24,7 +24,7 @@ It is implemented using bs4 and grequests
 pip install -r requirements.txt
 ```
 
-4. Fill the file private_info.py with your connection info for mysql
+4. Fill the file private_info.py with your connection info for mysql and your API Key to access Google API. 
 
 5. Run the following command to create the database
 ```
