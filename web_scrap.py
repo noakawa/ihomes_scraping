@@ -45,7 +45,7 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
         r = config.RADIUS
         if radius:
             r = radius
-        all_data = get_number_of_restaurants(all_data['Latitude'], all_data['Longitude'], r, all_data, sub_link)
+        all_data = get_number_of_restaurants(all_data['Latitude'], all_data['Longitude'], r, all_data)
     except AttributeError:
         logging.error(f'{sub_link}: no data')
 
@@ -117,20 +117,20 @@ def get_ll(soup, all_data, sub_link):
     return all_data
 
 
-def get_number_of_restaurants(latitude, longitude, radius, all_data, sub_link):
+def get_number_of_restaurants(latitude, longitude, radius, all_data):
     """
     This function returns the number of restaurant in a certain radius around a point
     :param latitude: latitude of the point
     :param longitude: longitude of the point
     :param radius: radius to get the number of restaurants
     :param all_data: previous dictionary
-    :param sub_link: link of the house
     :return: data including number of restaurants
     """
     url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude}%2C{longitude}&radius={radius}&type=restaurant&key={private_info.KEY} "
     payload = {}
     headers = {}
     response = requests.request("GET", url, headers=headers, data=payload)
+    out_of_scrap.access_url(response, url)
     all_data['Number_of_restaurant'] = len(json.loads(response.text)['results'])
     return all_data
 
@@ -266,7 +266,8 @@ def insert_into_db(data):
     db.insert_property(data['Link'], data['Sale or Rent ?'],
                        type_of_property_id[0][0], data['Floors in building'], data['Floor'],
                        data['Rooms'], data['Built Area'], data['Furnished'], data['First listed'],
-                       city_id[0][0], data['Condition'], data['Latitude'], data['Longitude'], data['Number_of_restaurant'])
+                       city_id[0][0], data['Condition'], data['Latitude'], data['Longitude'],
+                       data['Number_of_restaurant'])
 
     property_id = db.get_property_id(data['Link'])
     db.insert_price(property_id[0][0], date.today(), data['Price'])
