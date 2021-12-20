@@ -6,7 +6,7 @@ HE_TO_EN = {'פנטהאוז': 'Penthouse', 'בית': 'House', 'דירת גן': '
 ATTRIBUTES = ['Price', 'Sale or Rent ?', 'Condition', 'Type of property', 'Floors in building', 'Floor', 'Rooms',
               'Built Area', 'Furnished', 'First listed', 'Latitude', 'Longitude', 'Number_of_restaurant']
 OPTIONS = ['sell', 'rent']
-CITIES = {'r': 'raanana', 'j': 'jerusalem', 'tlv': 'tel-aviv-yafo', 'hrtz': 'herzliya', 'ad': 'ashdod',
+CITIES = {'r': 'raanana', 'tlv': 'tel-aviv-yafo', 'hrtz': 'herzliya', 'ad': 'ashdod',
           'h': 'haifa', 'n': 'netanya', 'ak': 'ashkelon'}
 RADIUS = 500
 API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={}%2C{}&radius={}&type=restaurant&key={}"
