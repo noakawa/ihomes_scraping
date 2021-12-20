@@ -9,5 +9,6 @@ OPTIONS = ['sell', 'rent']
 CITIES = {'r': 'raanana', 'j': 'jerusalem', 'tlv': 'tel-aviv-yafo', 'hrtz': 'herzliya', 'ad': 'ashdod',
           'h': 'haifa', 'n': 'netanya', 'ak': 'ashkelon'}
 RADIUS = 500
+API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={}%2C{}&radius={}&type=restaurant&key={}"
 
 

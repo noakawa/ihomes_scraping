@@ -126,7 +126,7 @@ def get_number_of_restaurants(latitude, longitude, radius, all_data):
     :param all_data: previous dictionary
     :return: data including number of restaurants
     """
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude}%2C{longitude}&radius={radius}&type=restaurant&key={private_info.KEY} "
+    url = config.API.format(latitude, longitude, radius, private_info.KEY)
     payload = {}
     headers = {}
     response = requests.request("GET", url, headers=headers, data=payload)
