@@ -35,13 +35,7 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
     try:
         features = soup.find('dl')  # find the first dl
         all_data = get_features(all_data, features, sub_link)
-        if min_date and all_data['First listed'] < min_date:
-            return
-        if sell_or_rent and all_data['Sale or Rent ?'].lower() != sell_or_rent:
-            return
         all_data = get_price(soup, all_data, sub_link)
-        if max_price and all_data['Price'] > max_price:
-            return
         all_data = get_ll(soup, all_data, sub_link)
         r = config.RADIUS
         if radius:
@@ -53,6 +47,15 @@ def get_data(city, soup, sub_link, sell_or_rent=False, max_price=False, min_date
     # Replacing empty string by None
     all_data_n = {k: None if not v else v for k, v in all_data.items()}
     data = subset_data(all_data_n, config.ATTRIBUTES, sub_link, city)
+    try:
+        if min_date and data['First listed'] < min_date:
+            return
+        if sell_or_rent and data['Sale or Rent ?'].lower() != sell_or_rent:
+            return
+        if max_price and data['Price'] > max_price:
+            return
+    except AttributeError:
+        return
     return data
 
 
@@ -230,6 +233,7 @@ def print_output(s, p, d, city, radius):
                              sell_or_rent=s, max_price=p, min_date=d, radius=radius)
             if value is not None:
                 insert_into_db(value)
+                print(value)
                 values.append(value)
     return values
 
