@@ -228,9 +228,9 @@ def print_output(s, p, d, city, radius):
         for i, soup in enumerate(out_of_scrap.links_to_soup(city_to_slinks[city])):
             value = get_data(city, soup, city_to_slinks[city][i],
                              sell_or_rent=s, max_price=p, min_date=d, radius=radius)
-            print(value)
-            insert_into_db(value)
-            values.append(value)
+            if value is not None:
+                insert_into_db(value)
+                values.append(value)
     return values
 
 
