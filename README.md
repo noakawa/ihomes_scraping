@@ -75,7 +75,11 @@ A dictionary used to match the inputs values of cities to the cities
 
 * RADIUS
 
-Defines the distance (in meters) within which to return the number of restaurants around the given propertie.
+Defines the distance (in meters) within which to return the number of restaurants around the given property.
+
+* API
+
+The API url to access Google API for the number of restaurants feature
 
 ### Implementation private_info.py
 

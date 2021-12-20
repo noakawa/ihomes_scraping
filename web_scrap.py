@@ -8,6 +8,7 @@ import out_of_scrap
 import logging
 import db_implementation
 import json
+import db_creation
 import requests
 
 import private_info
@@ -245,13 +246,16 @@ def get_args():
                         default=False)
     parser.add_argument('-r', '--radius', type=int, help=f"radius to calculate the numer of restaurants",
                         default=False)
+    parser.add_argument('-dr', '--drop', type=bool, help=f"True/False, if True, the database is dropped and recreated",
+                        default=False)
     args = parser.parse_args()
     s = args.sale_or_rent
     price = args.max_price
     d = args.min_date
     city = args.cities
     radius = args.radius
-    return [s, price, d, city, radius]
+    drop = args.drop
+    return [s, price, d, city, radius, drop]
 
 
 def insert_into_db(data):
@@ -276,6 +280,11 @@ def insert_into_db(data):
 
 def main():
     args = get_args()
+    db = db_creation.Creation()
+    if args[5] is True:
+        db.drop()
+    if not db.exist():
+        db.create_tables()
     print_output(args[0], args[1], args[2], args[3], args[4])
 
 
